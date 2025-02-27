@@ -1,0 +1,20 @@
+{
+     "name": "backend",
+     "version": "1.0.0",
+     "description": "its a backend for the surify",
+     "main": "index.js",
+     "scripts": {
+          "test": "nodemon index.js",
+          "format": "prettier --write .",
+          "format:check": "prettier --check ."
+     },
+     "keywords": [
+          "backend",
+          "mongoose"
+     ],
+     "author": "dhrumil",
+     "license": "ISC",
+     "devDependencies": {
+          "prettier": "^3.5.2"
+     }
+}
