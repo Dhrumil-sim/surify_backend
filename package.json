@@ -4,9 +4,10 @@
      "description": "its a backend for the surify",
      "main": "index.js",
      "scripts": {
-          "test": "nodemon index.js",
+          "test": "nodemon .src/index.js",
           "format": "prettier --write .",
-          "format:check": "prettier --check ."
+          "format:check": "prettier --check .",
+          "docs": "jsdoc -c jsdoc.json"
      },
      "keywords": [
           "backend",
@@ -15,6 +16,8 @@
      "author": "dhrumil",
      "license": "ISC",
      "devDependencies": {
+          "docdash": "^2.0.2",
+          "jsdoc": "^4.0.4",
           "prettier": "^3.5.2"
      }
 }
