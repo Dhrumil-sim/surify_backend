@@ -1,1 +1,1 @@
-export const DB_NANME: string = "surify";
+export const DB_NAME: string = "surify";
