@@ -3,8 +3,9 @@
      "version": "1.0.0",
      "description": "its a backend for the surify",
      "main": "index.js",
+     "type": "module",
      "scripts": {
-          "test": "nodemon .src/index.js",
+          "start": "nodemon --exec node --loader ts-node/esm src/index.ts",
           "format": "prettier --write .",
           "format:check": "prettier --check .",
           "docs": "jsdoc -c jsdoc.json"
@@ -16,8 +17,17 @@
      "author": "dhrumil",
      "license": "ISC",
      "devDependencies": {
+          "@types/node": "^22.13.9",
           "docdash": "^2.0.2",
           "jsdoc": "^4.0.4",
-          "prettier": "^3.5.2"
+          "nodemon": "^3.1.9",
+          "prettier": "^3.5.2",
+          "ts-node": "^10.9.2"
+     },
+     "dependencies": {
+          "dotenv": "^16.4.7",
+          "express": "^4.21.2",
+          "mongoose": "^8.12.1",
+          "tslib": "^2.8.1"
      }
 }
