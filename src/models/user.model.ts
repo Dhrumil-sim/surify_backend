@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
+
 /**
  * @module Models
  * @description This module contains Mongoose models for the application, including the User model.
@@ -19,7 +20,45 @@ import bcrypt from "bcrypt";
  * @property {Date} updatedAt - The timestamp when the user was last updated.
  */
 
+/**
+ * User Schema: Describes the structure for the User model, including validation, default values, and references.
+ * 
+ * @section UserSchema
+ * @description The `UserSchema` includes user details such as `username`, `email`, `password`, and user role.
+ * It also supports password hashing using a `pre-save` hook that hashes the password before saving the user.
+ * 
+ * @example
+ * const user = new User({
+ *     username: "john_doe",
+ *     email: "john.doe@example.com",
+ *     password: "plaintextpassword", // This will be hashed in the `pre` save hook.
+ *     role: "user"
+ * });
+ */
 
+/**
+ * @submodule UserSchema/PreHooks
+ * @description This submodule describes the `pre-save` hook attached to the User schema. 
+ * The hook hashes the user's password before saving the user document to the database.
+ * 
+ * @function passwordHashing
+ * @description This pre-save middleware hashes the password before saving it to the database.
+ * @async
+ * @param {Function} next - The callback function to move to the next middleware or save operation.
+ * @returns {void} The next middleware is executed after hashing the password.
+ * 
+ * @example
+ * userSchema.pre("save", async function (next) {
+ *     this.password = await bcrypt.hash(this.password, 10);
+ *     next();
+ * });
+ */
+
+/**
+ * User Schema definition
+ * @function userSchema
+ * @memberof module:Models/UserSchema
+ */
 const userSchema = new Schema(
     {
         username: {
@@ -50,15 +89,11 @@ const userSchema = new Schema(
             required: true,
             default: Date.now,
         },
-        refresh_token: {
-            type: String,
-            select: false, // Exclude refresh_token from being returned by default
-        },
         role: {
             type: String,
             enum: ['user', 'artist'],
             required: true,
-            default: 'user', // Default to 'user'
+            default: 'user',
         },
     },
     {
@@ -66,20 +101,24 @@ const userSchema = new Schema(
     }
 );
 
-
 /**
- * @description This is the pre hook for the password field to encrypt it just before being saved
+ * Pre-save hook to hash the user's password before saving.
+ * This will be triggered before the `User` document is saved to the database.
  * 
- *  */ 
-userSchema.pre("save", async function (next: any) {
+ * @function passwordHashing
+ * @memberof module:Models/UserSchema
+ * @description Hashes the password using bcrypt before saving it.
+ * @async
+ * @param {Function} next - Callback to move to the next middleware function.
+ */
+userSchema.pre("save", async function (next) {
+    // Check if the password is modified or newly set
     if (this.isModified("password")) {
-        // Hash the password only if it has been modified
+        // Hash the password before saving
         this.password = await bcrypt.hash(this.password, 10);
     }
-    next();
+    next(); // Move to the next middleware or save process
 });
-
-
 
 /**
  * @function User
