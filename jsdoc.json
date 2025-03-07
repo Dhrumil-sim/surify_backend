@@ -8,7 +8,8 @@
   },
   "opts": {
     "destination": "./src/docs",
-    "template": "node_modules/docdash"
+    "template": "node_modules/docdash",
+    "recurse": true
   },
   "plugins": [
     "node_modules/jsdoc-plugin-typescript"
