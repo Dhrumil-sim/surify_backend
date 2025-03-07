@@ -120,6 +120,10 @@ userSchema.pre("save", async function (next) {
     next(); // Move to the next middleware or save process
 });
 
+userSchema.methods.isPasswordCorrect = async function (password:any) {
+    
+    return await bcrypt.compare(password,this.password);
+}
 /**
  * @function User
  * @memberof module:Models
