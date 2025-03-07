@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-
+import bcrypt from "bcrypt";
 /**
  * @module Models
  * @description This module contains Mongoose models for the application, including the User model.
@@ -20,7 +20,7 @@ import mongoose, { Schema } from "mongoose";
  */
 
 
-const UserSchema = new Schema(
+const userSchema = new Schema(
     {
         username: {
             type: String,
@@ -66,10 +66,25 @@ const UserSchema = new Schema(
     }
 );
 
+
+/**
+ * @description This is the pre hook for the password field to encrypt it just before being saved
+ * 
+ *  */ 
+userSchema.pre("save", async function (next: any) {
+    if (this.isModified("password")) {
+        // Hash the password only if it has been modified
+        this.password = await bcrypt.hash(this.password, 10);
+    }
+    next();
+});
+
+
+
 /**
  * @function User
  * @memberof module:Models
  * @description The Mongoose model representing a user in the application.
  * @returns {mongoose.Model} The User model.
  */
-export const User = mongoose.model("User", UserSchema);
+export const User = mongoose.model("User", userSchema);
