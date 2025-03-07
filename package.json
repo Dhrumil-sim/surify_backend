@@ -8,7 +8,7 @@
           "start": "nodemon --exec node --loader ts-node/esm src/index.ts",
           "format": "prettier --write .",
           "format:check": "prettier --check .",
-          "docs": "jsdoc -c jsdoc.json -r"
+          "docs": "jsdoc -c jsdoc.json"
      },
      "keywords": [
           "backend",
