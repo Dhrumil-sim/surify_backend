@@ -1,6 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
-
+import jwt from "jsonwebtoken";
+import { ACCESS_TOKEN_EXPIRY } from "../constants.js";
 /**
  * @module Models
  * @description This module contains Mongoose models for the application, including the User model.
@@ -124,6 +125,61 @@ userSchema.methods.isPasswordCorrect = async function (password:any) {
     
     return await bcrypt.compare(password,this.password);
 }
+
+
+/**
+ * Instance method to generate a JSON Web Token (JWT) for the user.
+ * 
+ * @function generateAccessToken
+ * @memberof module:Models/UserSchema
+ * @returns {string} - Returns the generated JWT as a string.
+ * @throws {Error} - Throws an error if token generation fails.
+ */
+userSchema.methods.generateAccessToken = function () {
+    const payload = {
+        _id: this.id,
+        email: this.email,
+        username: this.username,
+        role: this.role,
+    };
+
+    const secret = ACCESS_TOKEN_EXPIRY;
+    if (!secret) {
+        throw new Error("ACCESS_TOKEN_SECRET is not defined");
+    }
+
+    return jwt.sign(payload, secret as jwt.Secret, {
+        expiresIn: ACCESS_TOKEN_EXPIRY || '1h',
+    });
+};
+
+
+/**
+ * Instance method to generate a JSON Web Token (JWT) for the user.
+ * 
+ * @function generateRefershToken
+ * @memberof module:Models/UserSchema
+ * @returns {string} - Returns the generated JWT as a string.
+ * @throws {Error} - Throws an error if token generation fails.
+ */
+userSchema.methods.generateAccessToken = function () {
+    const payload = {
+        _id: this.id,
+    
+    };
+
+    const secret = ACCESS_TOKEN_EXPIRY;
+    if (!secret) {
+        throw new Error("ACCESS_TOKEN_SECRET is not defined");
+    }
+
+    return jwt.sign(payload, secret as jwt.Secret, {
+        expiresIn: ACCESS_TOKEN_EXPIRY || '1h',
+    });
+};
+
+
+
 /**
  * @function User
  * @memberof module:Models
