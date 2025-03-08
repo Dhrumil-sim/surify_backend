@@ -1,4 +1,4 @@
-export const DB_NAME: string = "surify";
+
 
 
 export const HTTP_ERRORS = {

@@ -4,9 +4,8 @@
  */
 
 import mongoose, { Connection } from "mongoose";
-import { DB_NAME } from "../constants.js";
-import dotenv from "dotenv";
 
+import dotenv from "dotenv";
 dotenv.config();
 
 /**
@@ -23,7 +22,7 @@ const connectDB = async (): Promise<Connection | void> => {
       throw new Error("MONGO_URI is not defined in environment variables");
     }
 
-    const connectionInstance = await mongoose.connect(`${process.env.MONGO_URI}/${DB_NAME}`);
+    const connectionInstance = await mongoose.connect(`${process.env.MONGO_URI}`);
 
     console.log(`✅ MongoDB connected! Host: ${connectionInstance.connection.host}`);
 
