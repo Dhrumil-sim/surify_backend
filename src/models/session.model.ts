@@ -1,12 +1,10 @@
 import mongoose,{Schema} from "mongoose";
-import { User } from "./user.model.js";
-import { timeStamp } from "console";
 
 const sessionSchema = new Schema(
    {
       user_id :{
          type: Schema.Types.ObjectId,
-         ref: User,
+         ref: 'User',
          required: true,
       },
 
@@ -16,7 +14,8 @@ const sessionSchema = new Schema(
       },
       
       expireAt : {
-        type: timeStamp,
+        type: Date,
+        default: Date.now,
         required: true,
       }
 
