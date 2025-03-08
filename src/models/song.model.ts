@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+import { User } from "./user.model.js";
 
 /**
  * @module Models
@@ -24,7 +25,7 @@ const songSchema = new Schema(
   {
     artist: {
       type: Schema.Types.ObjectId,
-      ref: 'User', // Reference to the 'User' model (the artist of the song)
+      ref: User, // Reference to the 'User' model (the artist of the song)
       required: true, // Ensures the song must be associated with an artist
     },
     title: {
