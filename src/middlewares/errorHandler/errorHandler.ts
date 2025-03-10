@@ -1,23 +1,19 @@
 import { Request, Response, NextFunction } from 'express';
 import { ApiError } from '../../utils/ApiError.js';
 
-const errorHandler = (
-    err: ApiError,
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
-    const statusCode = err.statusCode || 500;
-    const message = err.message || 'Internal Server Error';
-
+const errorHandler = (err: ApiError, req: Request, res: Response, next: NextFunction) => {
     // Log the error details
-    console.error(`Status Code: ${statusCode}, Message: ${message}, Stack: ${err.stack}`);
+    console.error(`[${new Date().toISOString()}] ${err.errorCode}: ${err.message}`);
+    if (err.errors.length > 0) {
+        console.error('Details:', JSON.stringify(err.errors, null, 2));
+    }
 
     // Send the error response
-    res.status(statusCode).json({
-        success: false,
-        message,
-        errors: err.errors || [],
+    res.status(err.statusCode).json({
+        success: err.success,
+        errorCode: err.errorCode,
+        message: err.message,
+        errors: err.errors,
     });
 };
 
