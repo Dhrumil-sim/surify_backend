@@ -96,6 +96,11 @@ const userSchema = new Schema(
             required: true,
             default: 'user',
         },
+        last_password_update: {
+            type: Date,
+            default: Date.now, // Set to current date by default
+          },
+
     },
     {
         timestamps: true, // Automatically adds createdAt and updatedAt fields
