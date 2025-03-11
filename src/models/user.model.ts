@@ -151,14 +151,13 @@ userSchema.methods.generateAccessToken = function () {
     };
 
     const secret = process.env.ACCESS_TOKEN_SECRET;
-    const expiry = process.env.ACCESS_TOKEN_EXPIRY;
+    const expiry:any  = process.env.ACCESS_TOKEN_EXPIRY;
     if (!secret) {
         throw new Error("ACCESS_TOKEN_SECRET is not defined");
     }
     
-    console.log(process.env.ACCESS_TOKEN_EXPIRY);
     return jwt.sign(payload, secret, {
-        expiresIn: '2d',
+        expiresIn: expiry,
     });
 };
 
@@ -178,12 +177,13 @@ userSchema.methods.generateAccessToken = function () {
     };
 
     const secret = process.env.ACCESS_TOKEN_SECRET;
+    const expiry: any = process.env.ACCESS_TOKEN_EXPIRY;
     if (!secret) {
         throw new Error("ACCESS_TOKEN_SECRET is not defined");
     }
 
     return jwt.sign(payload, secret , {
-        expiresIn: '2d',
+        expiresIn: expiry,
     });
 };
 
