@@ -2,68 +2,48 @@ import { Request, Response, NextFunction } from 'express';
 import { ApiError } from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { User } from '../models/user.model.js';
-import { upload } from '../middlewares/fileUpload/multer.middleware.js';
-import { ApiResponse } from '../utils/ApiResponse.js';
+
 const registerUser = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const { username, email, password,role} = req.body;
+    // 🛠 Debugging logs
+    console.log("Received Body:", req.body);
+    console.log("Received Files:", req.files);
 
-    if ([username,email,password,role].some((field)=>field?.trim()==="")) 
-    {
-        // Throwing a 400 Bad Request error with a specific error code
-        throw new ApiError(400, 'ALL_IS_REQUIRED', 'All fields are required');
-    }
+    const { username, email, password, role } = req.body;
 
+    // ✅ Ensure req.body fields exist
+    // if (!username || !email || !password || !role) {
+    //     throw new ApiError(400, 'ALL_IS_REQUIRED', 'All fields are required');
+    // }   
 
-     // it will check that user is already exists or not with either given email or username
-
-    const existedUser = User.findOne({
-        $or: [{ username },{email}]
-    });
-
-    if(await existedUser)
-    {
-         throw new ApiError(409,'ALREADY_EXISTED_USER',"User with given username or email is already exists");
-    }
-    // 
-
-    // check for profile-pic
-
-    // Check for profile-pic upload
+    // ✅ Fix TypeScript issue: Assert `req.files`
     const files = req.files as { [fieldname: string]: Express.Multer.File[] } | undefined;
     const profilePicturePath = files?.['profile_pic']?.[0]?.path || null;
 
+    // ✅ Check if user already exists
+    const existedUser = await User.findOne({ $or: [{ username }, { email }] });
 
-    // check for the role
-
-    if(!(role==='user'|| role==='artist'))
-    {
-        throw new ApiError(409,'Invalid_Roles',"Kindly Enter Valid Roles");
+    if (existedUser) {
+        throw new ApiError(409, 'ALREADY_EXISTED_USER', "User with given username or email already exists");
     }
 
-   const user =  User.create({
+    // ✅ Create new user with profile picture
+    const newUser = await User.create({
         username,
         email,
-        password,
-        profile_pic: profilePicturePath,
-        role: role.toLowerCase(),
+        password, // Hash password before saving
+        role,
+        profile_picture: profilePicturePath
     });
 
-    const createdUser = await User.findById((await user)._id).select(
-        "-password -refreshToken"
-    )
-
-    if(!createdUser)
-    {
-         throw new ApiError(500,"Something went wrong while registration ");
-    }
-
-
-    return res.status(201).json(
-     new ApiResponse(200,createdUser,"User registered Successfully")
-    );
-    
-
-
+    res.status(201).json({
+        message: "User registered successfully",
+        user: {
+            id: newUser._id,
+            username: newUser.username,
+            email: newUser.email,
+            profile_picture: newUser.profile_picture
+        }
+    });
 });
 
 export { registerUser };
