@@ -150,7 +150,7 @@ userSchema.methods.generateAccessToken = function () {
         role: this.role,
     };
 
-    const secret = process.env.ACCESS_TOKEN_SECRET;
+    const secret:any = process.env.ACCESS_TOKEN_SECRET;
     const expiry:any  = process.env.ACCESS_TOKEN_EXPIRY;
     if (!secret) {
         throw new Error("ACCESS_TOKEN_SECRET is not defined");
@@ -176,7 +176,7 @@ userSchema.methods.generateAccessToken = function () {
     
     };
 
-    const secret = process.env.ACCESS_TOKEN_SECRET;
+    const secret:any = process.env.ACCESS_TOKEN_SECRET;
     const expiry: any = process.env.ACCESS_TOKEN_EXPIRY;
     if (!secret) {
         throw new Error("ACCESS_TOKEN_SECRET is not defined");
