@@ -23,7 +23,7 @@
           "@types/cors": "^2.8.17",
           "@types/express": "^5.0.0",
           "@types/jsonwebtoken": "^9.0.9",
-          "@types/node": "^22.13.9",
+          "@types/node": "^22.13.10",
           "@typescript-eslint/parser": "^8.26.0",
           "docdash": "^2.0.2",
           "jsdoc": "^4.0.4",

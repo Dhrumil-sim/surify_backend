@@ -3,9 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { env } from "node:process";
-dotenv.config({
-    path: '../../.env',
-});
+dotenv.config();
 /**
  * @module Models
  * @description This module contains Mongoose models for the application, including the User model.
@@ -153,13 +151,14 @@ userSchema.methods.generateAccessToken = function () {
     };
 
     const secret = process.env.ACCESS_TOKEN_SECRET;
+    const expiry = process.env.ACCESS_TOKEN_EXPIRY;
     if (!secret) {
         throw new Error("ACCESS_TOKEN_SECRET is not defined");
     }
     
     console.log(process.env.ACCESS_TOKEN_EXPIRY);
     return jwt.sign(payload, secret, {
-        expiresIn: process.env.ACCESS_TOKEN_EXPIRY || '1h',
+        expiresIn: '2d',
     });
 };
 
@@ -178,13 +177,13 @@ userSchema.methods.generateAccessToken = function () {
     
     };
 
-    const secret = process.env.ACCESS_TOKEN_EXPIRY;
+    const secret = process.env.ACCESS_TOKEN_SECRET;
     if (!secret) {
         throw new Error("ACCESS_TOKEN_SECRET is not defined");
     }
 
     return jwt.sign(payload, secret , {
-        expiresIn: process.env.ACCESS_TOKEN_EXPIRY as string || '1h',
+        expiresIn: '2d',
     });
 };
 
