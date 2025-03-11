@@ -5,9 +5,13 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 const registerUser = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const { username, email, password, joining_date, role } = req.body;
 
-    if (!username) {
+    if (
+        [username,email,password,role].some((field)=>{
+
+            field?.trim()===""
+        }) ) {
         // Throwing a 400 Bad Request error with a specific error code
-        throw new ApiError(400, 'USERNAME_REQUIRED', 'Username cannot be empty');
+        throw new ApiError(400, 'ALL_IS_REQUIRED', 'All fields are required');
     }
 
     // Additional user registration logic here
