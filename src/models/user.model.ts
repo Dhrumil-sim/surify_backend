@@ -152,7 +152,7 @@ userSchema.pre("save", async function (next) {
 });
 
 // Custom instance method to check if the password is correct
-userSchema.methods.isPasswordCorrect = async function(password: string): Promise<boolean> {
+userSchema.methods.isPasswordCorrect = async function(password: string){
     return bcrypt.compare(password, this.password);
 };
 
@@ -193,7 +193,7 @@ userSchema.methods.generateAccessToken = function () {
  * @returns {string} - Returns the generated JWT as a string.
  * @throws {Error} - Throws an error if token generation fails.
  */
-userSchema.methods.generateAccessToken = function () {
+userSchema.methods.generateRefreshToken = function () {
     const payload = {
         _id: this.id,
     
