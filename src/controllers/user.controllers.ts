@@ -160,5 +160,4 @@ const loginUser = asyncHandler(async (req: Request, res: Response, next: NextFun
         )
     )
 });
-
 export { registerUser };
