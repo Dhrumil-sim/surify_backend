@@ -1,9 +1,29 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema , Document, model} from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { env } from "node:process";
 dotenv.config();
+
+
+// Define the interface for the user document with your custom methods
+interface IUser extends Document {
+    username: string;
+    email: string;
+    password: string;
+    profile_picture?: string;
+    joining_date: Date;
+    role: 'user' | 'artist';
+    last_password_update?: Date;
+
+    // Custom instance methods
+    isPasswordCorrect(password: string): Promise<boolean>;
+    generateAccessToken(): string;
+    generateRefreshToken(): string;
+}
+
+
+
 /**
  * @module Models
  * @description This module contains Mongoose models for the application, including the User model.
@@ -128,10 +148,10 @@ userSchema.pre("save", async function (next) {
     next(); // Move to the next middleware or save process
 });
 
-userSchema.methods.isPasswordCorrect = async function (password:any) {
-    
-    return await bcrypt.compare(password,this.password);
-}
+// Custom instance method to check if the password is correct
+userSchema.methods.isPasswordCorrect = async function(password: string): Promise<boolean> {
+    return bcrypt.compare(password, this.password);
+};
 
 
 /**
@@ -195,4 +215,4 @@ userSchema.methods.generateAccessToken = function () {
  * @description The Mongoose model representing a user in the application.
  * @returns {mongoose.Model} The User model.
  */
-export const User = mongoose.model("User", userSchema);
+export const User = mongoose.model<IUser>("User", userSchema);
