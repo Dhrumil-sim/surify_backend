@@ -5,6 +5,12 @@ import { User } from '../models/user.model.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 
 
+// Extend Express Request to include cookies
+interface AuthenticatedRequest extends Request {
+    cookies: { accessToken?: string }; // Define cookies with accessToken
+    user?: any;
+}
+
 const generateAccessAndRefreshTokens = async (UserId: string) => {
     try {
         // Find the user by ID
@@ -160,4 +166,30 @@ const loginUser = asyncHandler(async (req: Request, res: Response, next: NextFun
         )
     )
 });
+
+const logoutUser = asyncHandler(async(req: AuthenticatedRequest, res: Response) => {
+    await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $unset: {
+                refreshToken: 1 // this removes the field from document
+            }
+        },
+        {
+            new: true
+        }
+    )
+
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(new ApiResponse(200, {}, "User logged Out"))
+})
+
 export { registerUser };
