@@ -124,7 +124,7 @@ const registerUser = asyncHandler(async (req: Request, res: Response, next: Next
     });
 });
 
-const loginUser = asyncHandler(async (req: Request, res: Response, next: NextFunction)=>{
+ const loginUser = asyncHandler(async (req: Request, res: Response, next: NextFunction)=>{
 
     const {email,username,password} = req.body;
 
@@ -192,4 +192,4 @@ const logoutUser = asyncHandler(async(req: AuthenticatedRequest, res: Response) 
     .json(new ApiResponse(200, {}, "User logged Out"))
 })
 
-export { registerUser };
+export { registerUser, loginUser,logoutUser };
