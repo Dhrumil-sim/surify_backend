@@ -131,10 +131,6 @@ const registerUser = asyncHandler(async (req: Request, res: Response, next: Next
 const loginUser = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const { email, username, password } = req.body;
 
-    console.log("JWT Secret:", process.env.ACCESS_TOKEN_SECRET);
-console.log("JWT Expiry:", process.env.ACCESS_TOKEN_EXPIRY);
-
-
     if (!username && !email) {
         throw new ApiError(400, "Username or Email is required");
     }
@@ -144,9 +140,6 @@ console.log("JWT Expiry:", process.env.ACCESS_TOKEN_EXPIRY);
     if (!user) {
         throw new ApiError(404, "User doesn't exist with the given username or email");
     }
-
-    console.log("User found:", user);
-
     // Check password
     const isPasswordValid = await user.isPasswordCorrect(password);
 
