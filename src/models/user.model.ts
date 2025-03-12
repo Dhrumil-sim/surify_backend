@@ -15,7 +15,7 @@ interface IUser extends Document {
     joining_date: Date;
     role: 'user' | 'artist';
     last_password_update?: Date;
-
+    refreshToken?: string;
     // Custom instance methods
     isPasswordCorrect(password: string): Promise<boolean>;
     generateAccessToken(): string;
@@ -117,6 +117,9 @@ const userSchema = new Schema(
             enum: ['user', 'artist'],
             required: true,
             default: 'user',
+        },
+        refreshToken: {
+            type: String
         },
         last_password_update: {
             type: Date,
