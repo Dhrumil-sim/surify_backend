@@ -3,6 +3,37 @@ import { ApiError } from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { User } from '../models/user.model.js';
 
+
+const generateAccessAndRefreshTokens = async (UserId: string) => {
+    try {
+        // Find the user by ID
+        const user = await User.findById(UserId);
+
+        // Check if user exists
+        if (!user) {
+            throw new ApiError(404, "User not found");
+        }
+
+        // Generate access and refresh tokens
+        const accessToken = user.generateAccessToken();
+        const refreshToken = user.generateRefreshToken();
+
+        // Assign the refreshToken to the user instance
+        user.refreshToken = refreshToken;
+
+        // Save the updated user document with the new refreshToken
+        await user.save({ validateBeforeSave: false});
+
+        // Optionally return the tokens
+        return { accessToken, refreshToken };
+        
+    } catch (error) {
+        console.error(error);
+        throw new ApiError(500, "Something went wrong while generating tokens");
+    }
+};
+
+
 // Regular expression for validating password strength
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
@@ -104,14 +135,6 @@ const loginUser = asyncHandler(async (req: Request, res: Response, next: NextFun
     {
         throw new ApiError(404,"User doesn't exists with given username or email");
     }
-
-   const isPasswordValid =  await user.isPasswordCorrect(password);
-
-   if(!isPasswordValid)
-   {
-     throw new ApiError(401,"Invalid Credentials Password is incorrect");
-   }
-
 });
 
 export { registerUser };
