@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { ApiError } from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { User } from '../models/user.model.js';
+import { ApiResponse } from '../utils/ApiResponse.js';
 
 
 const generateAccessAndRefreshTokens = async (UserId: string) => {
@@ -135,6 +136,29 @@ const loginUser = asyncHandler(async (req: Request, res: Response, next: NextFun
     {
         throw new ApiError(404,"User doesn't exists with given username or email");
     }
+
+    const {accessToken,refreshToken} = await generateAccessAndRefreshTokens(user.id);
+
+    const loggedInUser = await User.findById(user.id).select("-password -refershToken");
+
+    const options = {
+        httpOnly: true,
+        secure: true,
+    }
+
+    return res.status(200)
+    .cookie("accessToken",accessToken,options)
+    .cookie("refreshToken",refreshToken,options)
+    .json(
+        new ApiResponse(
+              200,
+            {
+                user: loggedInUser,accessToken,refreshToken
+            },
+
+            "User LoggedIn Successfully"
+        )
+    )
 });
 
 export { registerUser };
