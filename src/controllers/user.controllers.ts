@@ -86,4 +86,32 @@ const registerUser = asyncHandler(async (req: Request, res: Response, next: Next
     });
 });
 
+const loginUser = asyncHandler(async (req: Request, res: Response, next: NextFunction)=>{
+
+    const {email,username,password} = req.body;
+
+    if(!username || !email)
+    {
+         throw new ApiError(400,"Username or Email is required");
+    }
+
+    const user = await User.findOne({
+        $or: [{username},{email}],
+    }
+    );
+
+    if(!user)
+    {
+        throw new ApiError(404,"User doesn't exists with given username or email");
+    }
+
+   const isPasswordValid =  await user.isPasswordCorrect(password);
+
+   if(!isPasswordValid)
+   {
+     throw new ApiError(401,"Invalid Credentials Password is incorrect");
+   }
+
+});
+
 export { registerUser };
