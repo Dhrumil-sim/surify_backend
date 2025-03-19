@@ -4,6 +4,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { User } from '../models/user.model.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import jwt from 'jsonwebtoken';
+import { StatusCodes } from "http-status-codes";
 
 // Extend Express Request to include cookies
 interface AuthenticatedRequest extends Request {
@@ -19,7 +20,7 @@ const generateAccessAndRefreshTokens = async (UserId: string) => {
          console.log(user);
         // Check if user exists
         if (!user) {
-            throw new ApiError(404, "User not found");
+            throw new ApiError(StatusCodes.NOT_FOUND, "User not found");
         }
 
         // Generate access and refresh tokens
@@ -55,7 +56,7 @@ const registerUser = asyncHandler(async (req: Request, res: Response, next: Next
 
     // ✅ Ensure all fields are provided
     if (!username || !email || !password || !role) {
-        throw new ApiError(400, 'ALL_IS_REQUIRED', 'All fields (username, email, password, role) are required');
+        throw new ApiError(StatusCodes.BAD_REQUEST,'All fields (username, email, password, role) are required');
     }
 
     // ✅ Validate username
@@ -132,7 +133,7 @@ const loginUser = asyncHandler(async (req: Request, res: Response, next: NextFun
     const { email, username, password } = req.body;
 
     if (!username && !email) {
-        throw new ApiError(400, "Username or Email is required");
+        throw new ApiError(StatusCodes.BAD_REQUEST,""+StatusCodes.BAD_REQUEST, "Username or Email is required");
     }
 
     const user = await User.findOne({ $or: [{ username }, { email }] }).select("+password");
@@ -213,7 +214,7 @@ export const refreshAccessToken = asyncHandler(async (req: Request,res: Response
 
         if(!user)
         {
-             throw new ApiError(401,"User Doesn't Exists");
+             throw new ApiError(StatusCodes.BAD_REQUEST,"User Doesn't Exists");
         }
 
         // Now matching the user's refresh token and token which is stored in database
