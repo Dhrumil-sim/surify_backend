@@ -3,7 +3,7 @@ import { ApiError } from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { User } from '../models/user.model.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
-
+import jwt from 'jsonwebtoken';
 
 // Extend Express Request to include cookies
 interface AuthenticatedRequest extends Request {
@@ -201,5 +201,24 @@ const refreshAccessToken = asyncHandler(async (req: Request,res: Response)=>{
     if(!incomingRefreshToken)
     {
          throw new ApiError(401,"unauthorized request");
+    }
+    try
+    {
+        const refreshTokenSecret: any = process.env.REFRESH_TOKEN_SECRET;
+        const decodedToken: any = jwt.verify(incomingRefreshToken,refreshTokenSecret);
+
+        // now based on decoded token search that user is exists or not in database 
+
+        const user = await User.findById(decodedToken?._id);
+
+        if(!user)
+        {
+             throw new ApiError(401,"User Doesn't Exists");
+        }
+    
+    }
+    catch(error)
+    {
+        throw new ApiError(401,"Invalid User or Refresh Token");
     }
 });
