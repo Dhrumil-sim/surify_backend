@@ -1,3 +1,4 @@
+import { FileArray, File } from 'multer';
 // declare global {
 //     namespace NodeJS {
 //         interface ProcessEnv {
@@ -21,4 +22,3 @@ declare global {
       }
     }
   }
-  

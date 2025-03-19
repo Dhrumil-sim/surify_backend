@@ -194,7 +194,7 @@ export { registerUser, loginUser,logoutUser };
 
 // Refresh token matching with database
 
-const refreshAccessToken = asyncHandler(async (req: Request,res: Response)=>{
+export const refreshAccessToken = asyncHandler(async (req: Request,res: Response)=>{
 
     const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
 
@@ -231,9 +231,19 @@ const refreshAccessToken = asyncHandler(async (req: Request,res: Response)=>{
         }
 
         const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user.id);
-        
-    
+
+        return res
+        .status(200)
+        .cookie("accessToken",accessToken)
+        .cookie("refreshToken",refreshToken)
+        .json(
+            new ApiResponse(
+                200,
+                {accessToken,refreshAccessToken}
+            ),
+        );
     }
+
     catch(error)
     {
         throw new ApiError(401,"Invalid User or Refresh Token");
