@@ -215,6 +215,13 @@ const refreshAccessToken = asyncHandler(async (req: Request,res: Response)=>{
         {
              throw new ApiError(401,"User Doesn't Exists");
         }
+
+        // Now matching the user's refresh token and token which is stored in database
+
+        if(incomingRefreshToken !== user?.refreshToken)
+        {
+             throw new ApiError(401,"Invalid Refresh Token");
+        }
     
     }
     catch(error)
