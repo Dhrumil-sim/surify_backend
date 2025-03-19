@@ -143,7 +143,6 @@ const loginUser = asyncHandler(async (req: Request, res: Response, next: NextFun
     // Check password
     const isPasswordValid = await user.isPasswordCorrect(password);
 
-    console.log("isPasswordValid", isPasswordValid);
     if (!isPasswordValid) {
         console.log("Password is not valid");
         throw new ApiError(401, "Invalid credentials");
@@ -154,9 +153,7 @@ const loginUser = asyncHandler(async (req: Request, res: Response, next: NextFun
     // Generate tokens
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user.id);
 
-    console.log("Access Token:", accessToken);
-    console.log("Refresh Token:", refreshToken);
-
+ 
     const loggedInUser = await User.findById(user.id).select("-password -refreshToken");
 
     const options = { httpOnly: true, secure: true };
