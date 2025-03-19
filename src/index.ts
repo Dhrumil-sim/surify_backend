@@ -1,18 +1,17 @@
+import dotenv from "dotenv";
 import connectDB from "./db/index.js";
-import express from "express";
-import { app } from './app.js';
-import dotenv from 'dotenv';
+import app from "./app.js";
+
 dotenv.config();
+
 const PORT = process.env.PORT || 3000;
 
-console.log(typeof process.env.ACCESS_TOKEN_EXPIRY);
 connectDB()
-.then(() => {
-    app.listen(process.env.PORT || 8000, () => {
-        console.log(`⚙️ Server is running at port : http://localhost:${process.env.PORT}`);
+    .then(() => {
+        app.listen(PORT, () => {
+            console.log(`⚙️ Server is running at: http://localhost:${PORT}`);
+        });
     })
-})
-.catch((err) => {
-    console.log("MONGO db connection failed !!! ", err);
-})
-
+    .catch((err) => {
+        console.error("❌ MongoDB connection failed!", err);
+    });
