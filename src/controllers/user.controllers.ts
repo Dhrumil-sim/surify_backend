@@ -191,3 +191,15 @@ const logoutUser = asyncHandler(async(req: AuthenticatedRequest, res: Response) 
 })
 
 export { registerUser, loginUser,logoutUser };
+
+// Refresh token matching with database
+
+const refreshAccessToken = asyncHandler(async (req: Request,res: Response)=>{
+
+    const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
+
+    if(!incomingRefreshToken)
+    {
+         throw new ApiError(401,"unauthorized request");
+    }
+});
