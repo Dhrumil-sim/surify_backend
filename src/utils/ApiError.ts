@@ -1,3 +1,5 @@
+import { StatusCodes, getReasonPhrase } from "http-status-codes";
+
 class ApiError extends Error {
     statusCode: number;
     data: any;
@@ -6,11 +8,11 @@ class ApiError extends Error {
     errorCode: string;
 
     constructor(
-        statusCode: number,
-        errorCode: string,
-        message = "Something went wrong",
+        statusCode: number = StatusCodes.INTERNAL_SERVER_ERROR,
+        errorCode: string = "INTERNAL_ERROR",
+        message: string = getReasonPhrase(statusCode),
         errors: any[] = [],
-        stack = ""
+        stack: string = ""
     ) {
         super(message);
         this.statusCode = statusCode;
