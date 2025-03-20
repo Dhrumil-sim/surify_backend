@@ -34,7 +34,9 @@ const songSchema = new Schema(
       trim: true, // Removes extra whitespace from the song title
     },
     album: {
-      type: String, // Optional field for the album name
+      type: Schema.Types.ObjectId,
+      ref: "Album",
+      default: null, // If a song belongs to an album, it references the Album model
     },
     genre: {
       type: [String], // Array of genre tokens
