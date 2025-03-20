@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { loginUser, logoutUser, registerUser } from "../controllers/user/user.controllers.js";
+import { loginUser, logoutUser, registerUser } from "../modules/user/user.controllers.js";
 import { upload } from "../middlewares/fileUpload/multer.middleware.js";
 import { verifyJWT } from "../middlewares/authHandler/auth.middleware.js";
 import { validateRequest } from "../middlewares/validateRequest/validateRequest.js";
-import { registerUserSchema } from "../controllers/user/utils/auth.validator.js";
+import { registerUserSchema } from "../modules/user/utils/auth.validator.js";
 const router = Router();
 
 
