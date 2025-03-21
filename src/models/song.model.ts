@@ -42,7 +42,7 @@ const songSchema = new Schema(
       type: [String], // Array of genre tokens
       required: true, // At least one genre should be associated with the song
     },
-    release_date: {
+    releaseDate: {
       type: Date,
       required: true, // The release date of the song must be provided
     },
@@ -50,11 +50,11 @@ const songSchema = new Schema(
       type: Number,
       required: true, // Duration in seconds
     },
-    cover_pic: {
+    coverPicture: {
       type: String,
       required: true, // The cover picture URL for the song
     },
-    file_path: {
+    filePath: {
       type: String,
       required: true, // The file path of the song
     },
