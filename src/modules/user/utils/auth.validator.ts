@@ -34,7 +34,7 @@
             }),
 
         role: Joi.string()
-            .valid("admin", "user")
+            .valid("artist", "user")
             .required()
             .messages({
                 "any.only": "Invalid role. Allowed roles are 'admin' and 'user'",
