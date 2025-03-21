@@ -2,6 +2,9 @@ import { Request,Response,NextFunction } from "express";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import SongMetaData from "./utils/songMetadata.util.js";
 import SongService from "./services/song.service.js";
+import { Song } from "../../models/song.model.js";
+import { ApiError } from "../../utils/ApiError.js";
+import { StatusCodes } from "http-status-codes";
 interface AuthenticatedRequest extends Request {
     cookies: { accessToken?: string, refreshToken?: string }; // Define cookies with accessToken
     user?: any;
@@ -12,6 +15,7 @@ interface AuthenticatedRequest extends Request {
 }
 
 class SongController {
+
     static createSong = asyncHandler(async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
       
         const { role, _id: artistId, genre } = req.user; // Extract user details
@@ -51,6 +55,25 @@ class SongController {
 
       
     });
+
+    static getAllSong = asyncHandler(async (req: AuthenticatedRequest, res: Response, next: NextFunction)=>{
+         
+        const allSongs = await SongService.getAllSongs();
+        
+        if(!allSongs)
+        {
+             throw new ApiError(StatusCodes.NOT_FOUND,"No music Founded");
+        }
+        else{
+
+            res.status(200).json({
+                allSongs
+            });
+        }
+
+
+    }
+);
   }
 
 export default SongController;

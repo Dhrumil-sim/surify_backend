@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 import { Song, ISong } from '../../../models/song.model.js';
+import { ApiError } from '../../../utils/ApiError.js';
+import { StatusCodes } from 'http-status-codes';
 
 class SongService {
   /**
@@ -33,6 +35,16 @@ class SongService {
     });
     return newSong;
   }
+  static async getAllSongs(): Promise<ISong[]> {
+    try {
+      // Fetch all songs and optionally populate artist information
+      const songs = await Song.find().populate('artist', 'name'); // Adjust the fields based on your requirements
+      return songs;
+    } catch (error) {
+        throw new ApiError(StatusCodes.NOT_FOUND,"Music Not Found");
+    }
+  }
+
 }
 
 export default SongService;

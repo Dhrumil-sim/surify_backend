@@ -13,5 +13,5 @@ router.post('/create', verifyJWT, uploadSong.fields([
     { name: 'filePath', maxCount: 1 },      // Audio field
   ]), validateRequest(songValidationSchema), SongController.createSong);
   
-
+router.get('/',verifyJWT,SongController.getAllSong);
 export default router;
