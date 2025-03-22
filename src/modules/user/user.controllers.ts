@@ -13,6 +13,7 @@ import { verifyJWT } from "../../middlewares/authHandler/auth.middleware.js";
 interface AuthenticatedRequest extends Request {
     cookies: { accessToken?: string , refreshToken?: string}; // Define cookies with accessToken
     user?: any;
+    session: any;
 }
 class AuthController {
     static  registerUser = asyncHandler( async (req: Request, res: Response, next: NextFunction)=> {
@@ -70,6 +71,8 @@ class AuthController {
             );
 
             const options = { httpOnly: true, secure: true };
+
+          
 
             return res.status(200)
                 .clearCookie('accessToken', options)
