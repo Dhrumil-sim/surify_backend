@@ -1,4 +1,4 @@
-import mongoose, {Schema} from "mongoose";
+import mongoose, { Schema } from 'mongoose';
 
 /**
  * @typedef Playlist
@@ -9,11 +9,11 @@ import mongoose, {Schema} from "mongoose";
  * @property {boolean} isShared - Whether the playlist is shared or private.
  */
 const playlistSchema = new Schema({
-    name: { type: String, required: true },
-    description: { type: String },
-    createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    dateCreated: { type: Date, default: Date.now },
-    isShared: { type: Boolean, default: false }
-  });
-  
-  module.exports = mongoose.model('Playlist', playlistSchema);
+  name: { type: String, required: true },
+  description: { type: String },
+  createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  dateCreated: { type: Date, default: Date.now },
+  isShared: { type: Boolean, default: false },
+});
+
+module.exports = mongoose.model('Playlist', playlistSchema);

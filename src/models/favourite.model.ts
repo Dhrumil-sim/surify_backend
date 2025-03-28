@@ -1,4 +1,4 @@
-import mongoose,{Schema} from "mongoose";
+import mongoose, { Schema } from 'mongoose';
 
 /**
  * @typedef Favorite
@@ -9,7 +9,7 @@ import mongoose,{Schema} from "mongoose";
 const favoritesSchema = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   songId: { type: Schema.Types.ObjectId, ref: 'Song', required: true },
-  addedAt: { type: Date, default: Date.now }
+  addedAt: { type: Date, default: Date.now },
 });
 
 module.exports = mongoose.model('Favorite', favoritesSchema);

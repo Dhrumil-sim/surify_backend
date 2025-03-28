@@ -11,9 +11,9 @@
  * @returns {Function} Express middleware function that handles errors.
  */
 const asyncHandler = (requestHandler: Function) => {
-    return (req: Object, res: Object, next: any) => {
-        Promise.resolve(requestHandler(req, res, next)).catch((err) => next(err));
-    };
+  return (req: Object, res: Object, next: any) => {
+    Promise.resolve(requestHandler(req, res, next)).catch((err) => next(err));
+  };
 };
 
-export {asyncHandler};
+export { asyncHandler };
