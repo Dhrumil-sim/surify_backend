@@ -1,12 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { ApiError } from '../../utils/ApiError.js';
 
-const errorHandler = (
-  err: ApiError,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const errorHandler = (err: ApiError, req: Request, res: Response) => {
   // Log the error details
   console.error(
     `[${new Date().toISOString()}] ${err.errorCode}: ${err.message}`

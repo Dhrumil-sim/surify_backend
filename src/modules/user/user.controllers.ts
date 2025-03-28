@@ -10,8 +10,14 @@ import Jwt from 'jsonwebtoken';
 
 interface AuthenticatedRequest extends Request {
   cookies: { accessToken?: string; refreshToken?: string }; // Define cookies with accessToken
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   user?: any;
 }
+interface DecodedToken {
+  _id: string;
+  // Add other properties as present in your JWT payload
+}
+
 class AuthController {
   static registerUser = asyncHandler(
     async (req: Request, res: Response, next: NextFunction) => {
@@ -102,7 +108,7 @@ class AuthController {
           .json(
             new ApiResponse(StatusCodes.OK, {}, 'User logged out successfully')
           );
-      } catch (error) {
+      } catch {
         return res
           .status(500)
           .json(
@@ -126,11 +132,11 @@ class AuthController {
       }
 
       try {
-        const refreshTokenSecret: any = process.env['REFRESH_TOKEN_SECRET'];
-        const decodedToken: any = Jwt.verify(
+        const refreshTokenSecret = process.env['REFRESH_TOKEN_SECRET'];
+        const decodedToken = Jwt.verify(
           incomingRefreshToken,
           refreshTokenSecret
-        );
+        ) as DecodedToken;
 
         // now based on decoded token search that user is exists or not in database
 
@@ -156,7 +162,7 @@ class AuthController {
               'Tokens refreshed successfully'
             )
           );
-      } catch (error) {
+      } catch {
         throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid Refresh Token');
       }
     }

@@ -40,7 +40,7 @@ class SongService {
       // Fetch all songs and optionally populate artist information
       const songs = await Song.find().populate('artist', 'name'); // Adjust the fields based on your requirements
       return songs;
-    } catch (error) {
+    } catch {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Music Not Found');
     }
   }

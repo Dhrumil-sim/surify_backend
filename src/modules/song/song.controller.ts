@@ -7,6 +7,7 @@ import { ApiError } from '../../utils/ApiError.js';
 import { StatusCodes } from 'http-status-codes';
 interface AuthenticatedRequest extends Request {
   cookies: { accessToken?: string; refreshToken?: string }; // Define cookies with accessToken
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   user?: any;
   files: {
     coverPicture?: Express.Multer.File[]; // Array of image files

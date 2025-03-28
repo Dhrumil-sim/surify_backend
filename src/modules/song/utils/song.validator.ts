@@ -1,5 +1,4 @@
 import Joi from 'joi';
-import { now } from 'mongoose';
 
 /**
  * Joi validation schema for the song model
@@ -34,7 +33,7 @@ const songValidationSchema = Joi.object({
               throw new Error();
             }
             return parsed;
-          } catch (err) {
+          } catch {
             return helpers.error('string.invalid');
           }
         })

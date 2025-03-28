@@ -1,6 +1,4 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { User } from './user.model.js';
-import { Song } from './song.model.js';
 
 /**
  * Interface for Album Document
