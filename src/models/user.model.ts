@@ -121,6 +121,10 @@ const userSchema = new Schema(
       type: Date,
       default: Date.now, // Set to current date by default
     },
+    deletedAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true, // Automatically adds createdAt and updatedAt fields
