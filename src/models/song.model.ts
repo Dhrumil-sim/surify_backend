@@ -12,6 +12,7 @@ export interface ISong extends Document {
   duration: number;
   coverPicture: string;
   filePath: string;
+  deletedAt?: Date | null;
 }
 
 /**
@@ -53,6 +54,10 @@ const songSchema = new Schema<ISong>(
     filePath: {
       type: String,
       required: true,
+    },
+    deletedAt: {
+      type: Date,
+      default: null, // Ensures the field is present by default
     },
   },
   {
