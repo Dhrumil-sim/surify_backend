@@ -5,6 +5,7 @@ import SongService from './services/song.service.js';
 
 import { ApiError } from '../../utils/ApiError.js';
 import { StatusCodes } from 'http-status-codes';
+import { ISong } from '../../models/song.model.js';
 interface AuthenticatedRequest extends Request {
   cookies: { accessToken?: string; refreshToken?: string }; // Define cookies with accessToken
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -77,6 +78,67 @@ class SongController {
         res.status(200).json({
           allSongs,
         });
+      }
+    }
+  );
+
+  static getSongById = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const songId = '' + req.params.songId;
+      console.log(songId);
+      const song = await SongService.getSongById(songId);
+      res.status(200).json({ song });
+    }
+  );
+
+  static updateSong = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+      const { role, _id: artistId } = req.user;
+      const songId = req.params.songId;
+      // check for existing song
+      const existingSong = await SongService.getSongById(songId);
+
+      if (!existingSong) {
+        throw new ApiError(StatusCodes.NOT_FOUND, 'Song not found');
+      }
+      if (role !== 'artist' && !existingSong.artist.equals(artistId)) {
+        throw new ApiError(
+          StatusCodes.UNAUTHORIZED,
+          'Only Artist can update their own song'
+        );
+      }
+      // Handle updated files
+      const updatedCoverPicture = req.files?.coverPicture?.[0]?.path;
+      const updatedFilePath = req.files?.filePath?.[0]?.path;
+
+      // Extract metadata if a new song file is uploaded
+      let updatedDuration = existingSong.duration; // Default to existing duration
+      if (updatedFilePath) {
+        const songMetadata = await SongMetaData.getMetadata(updatedFilePath);
+        updatedDuration =
+          songMetadata.format?.duration ?? existingSong.duration;
+      }
+      const { title, genre } = req.body;
+      const updatedFields: Partial<ISong> = {
+        title: title || existingSong.title,
+        genre: genre ? JSON.parse(genre) : existingSong.genre,
+        coverPicture: updatedCoverPicture || existingSong.coverPicture,
+        filePath: updatedFilePath || existingSong.filePath,
+        duration: updatedDuration,
+      };
+
+      console.log(updatedFields);
+
+      try {
+        // Update the song in the database
+        const updatedSong = await SongService.updateSong(songId, updatedFields);
+
+        res.status(200).json({
+          message: 'Song updated successfully',
+          data: updatedSong,
+        });
+      } catch (error) {
+        return next(error);
       }
     }
   );

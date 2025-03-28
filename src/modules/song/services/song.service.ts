@@ -44,6 +44,42 @@ class SongService {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Music Not Found');
     }
   }
+
+  static async getSongById(songId: string): Promise<ISong> {
+    try {
+      const objectId = new mongoose.Types.ObjectId(songId);
+      const song = await Song.findById(objectId);
+      if (!song) {
+        throw new ApiError(StatusCodes.NOT_FOUND, 'Music not found');
+      }
+      return song;
+    } catch {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Music not found');
+    }
+  }
+
+  static async updateSong(
+    songId: string,
+    updateData: Partial<ISong>
+  ): Promise<ISong> {
+    try {
+      const objectId = new mongoose.Types.ObjectId(songId);
+
+      // Find the song by ID and update it with the new data
+      const updatedSong = await Song.findByIdAndUpdate(objectId, updateData, {
+        new: true, // Return the updated document
+        runValidators: true, // Ensure validation is applied to updated fields
+      });
+
+      if (!updatedSong) {
+        throw new ApiError(StatusCodes.NOT_FOUND, 'Music not found');
+      }
+
+      return updatedSong;
+    } catch {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to update music');
+    }
+  }
 }
 
 export default SongService;

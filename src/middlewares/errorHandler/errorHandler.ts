@@ -1,8 +1,13 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { ApiError } from '../../utils/ApiError.js';
 
-const errorHandler = (err: ApiError, req: Request, res: Response) => {
-  // Log the error details
+const errorHandler = (
+  err: ApiError,
+  req: Request,
+  res: Response,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  next: NextFunction
+) => {
   console.error(
     `[${new Date().toISOString()}] ${err.errorCode}: ${err.message}`
   );
@@ -10,7 +15,6 @@ const errorHandler = (err: ApiError, req: Request, res: Response) => {
     console.error('Details:', JSON.stringify(err.errors, null, 2));
   }
 
-  // Send the error response
   res.status(err.statusCode).json({
     success: err.success,
     errorCode: err.errorCode,
