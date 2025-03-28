@@ -4,8 +4,9 @@ import { ApiError } from '../../../utils/ApiError.js';
 import { StatusCodes } from 'http-status-codes';
 
 class JWTService {
-  private static refreshTokenSecret = process.env
-    .REFRESH_TOKEN_SECRET as string;
+  private static refreshTokenSecret = process.env[
+    'REFRESH_TOKEN_SECRET'
+  ] as string;
 
   static async generateAccessAndRefreshTokens(userId: string) {
     try {
@@ -32,7 +33,7 @@ class JWTService {
     try {
       return jwt.verify(refreshToken, JWTService.refreshTokenSecret);
     } catch (error) {
-      throw new ApiError(401, 'Invalid Refresh Token');
+      throw new ApiError(401, 'Invalid Refresh Token : ' + error);
     }
   }
 }
