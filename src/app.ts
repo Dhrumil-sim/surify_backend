@@ -4,8 +4,6 @@ import cookieParser from 'cookie-parser';
 import userRouter from './routes/user.routes.js';
 import songRouter from './routes/song.routes.js';
 import { errorHandler } from './middlewares/errorHandler/errorHandler.js';
-import { ApiError } from './utils/ApiError.js';
-import { StatusCodes } from 'http-status-codes';
 
 class App {
   public app: Application;
@@ -14,7 +12,7 @@ class App {
     this.app = express();
     this.setMiddlewares();
     this.setRoutes();
-    this.handleUndefinedRoutes();
+
     this.setErrorHandler();
   }
 
@@ -34,12 +32,6 @@ class App {
 
   private setErrorHandler(): void {
     this.app.use(errorHandler);
-  }
-
-  private handleUndefinedRoutes(): void {
-    this.app.use('*', () => {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Not found');
-    });
   }
 
   public getServer(): Application {

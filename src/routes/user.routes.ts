@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import AuthController from '../modules/user/user.controllers.js';
 import { validateRequest } from '../middlewares/validateRequest/validateRequest.js';
-
 import {
   registerUserSchema,
   loginUserSchema,
@@ -17,6 +16,7 @@ router.post(
 );
 router.post(
   '/login',
+  upload.none(),
   validateRequest(loginUserSchema),
   AuthController.loginUser
 );
