@@ -22,7 +22,6 @@ const upload = multer({
 });
 
 // Check file type
-// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 const checkFileType = (
   file: Express.Multer.File,
   cb: FileFilterCallback
