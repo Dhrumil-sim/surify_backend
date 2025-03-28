@@ -1,10 +1,12 @@
-import dotenv from 'dotenv';
-import connectDB from './db/index.js';
-import app from './app.js';
-import { Request, Response } from 'express';
+import dotenv from "dotenv";
+import connectDB from "./db/index.js";
+import app from "./app.js";
+import { Request, Response } from "express";
+import { console } from "inspector";
 dotenv.config();
 
-const PORT = process.env['PORT'] || 3000;
+const PORT = process.env["PORT"] || 3000;
+console.log("hello");
 
 connectDB()
   .then(() => {
@@ -13,5 +15,5 @@ connectDB()
     });
   })
   .catch((err) => {
-    console.error('❌ MongoDB connection failed!', err);
+    console.error("❌ MongoDB connection failed!", err);
   });
