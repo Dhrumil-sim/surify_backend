@@ -6,6 +6,7 @@ import SongService from './services/song.service.js';
 import { ApiError } from '../../utils/ApiError.js';
 import { StatusCodes } from 'http-status-codes';
 import { ISong } from '../../models/song.model.js';
+import { ApiResponse } from '../../utils/ApiResponse.js';
 interface AuthenticatedRequest extends Request {
   cookies: { accessToken?: string; refreshToken?: string }; // Define cookies with accessToken
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -137,6 +138,23 @@ class SongController {
           message: 'Song updated successfully',
           data: updatedSong,
         });
+      } catch (error) {
+        return next(error);
+      }
+    }
+  );
+
+  // soft delete
+  static deleteSong = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+      const songId = req.params.songId;
+      try {
+        await SongService.deleteSong(songId);
+        return res
+          .status(200)
+          .json(
+            new ApiResponse(StatusCodes.OK, {}, 'User Deleted Successfully')
+          );
       } catch (error) {
         return next(error);
       }

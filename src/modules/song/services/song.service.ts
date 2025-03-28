@@ -38,7 +38,10 @@ class SongService {
   static async getAllSongs(): Promise<ISong[]> {
     try {
       // Fetch all songs and optionally populate artist information
-      const songs = await Song.find().populate('artist', 'name'); // Adjust the fields based on your requirements
+      const songs = await Song.find({ deletedAt: null }).populate(
+        'artist',
+        'name'
+      ); // Adjust the fields based on your requirements
       return songs;
     } catch {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Music Not Found');
@@ -48,7 +51,7 @@ class SongService {
   static async getSongById(songId: string): Promise<ISong> {
     try {
       const objectId = new mongoose.Types.ObjectId(songId);
-      const song = await Song.findById(objectId);
+      const song = await Song.findById(objectId, { deletedAt: null });
       if (!song) {
         throw new ApiError(StatusCodes.NOT_FOUND, 'Music not found');
       }
@@ -79,6 +82,14 @@ class SongService {
     } catch {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to update music');
     }
+  }
+  static async deleteSong(songId: string): Promise<void> {
+    const songExists = await this.getSongById(songId);
+    if (!songExists) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Song is not found');
+    }
+    songExists.deletedAt = new Date();
+    await songExists.save();
   }
 }
 
