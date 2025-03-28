@@ -16,6 +16,16 @@ router.post(
   validateRequest(songValidationSchema),
   SongController.createSong
 );
+router.put(
+  '/update/:songId',
+  verifyJWT,
+  uploadSong.fields([
+    { name: 'coverPicture', maxCount: 1 }, // Image field
+    { name: 'filePath', maxCount: 1 }, // Audio field
+  ]),
+  validateRequest(songValidationSchema),
+  SongController.updateSong
+);
 router.get('/:songId', verifyJWT, SongController.getSongById);
 router.get('/', verifyJWT, SongController.getAllSong);
 export default router;
