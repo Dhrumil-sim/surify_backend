@@ -1,8 +1,7 @@
-import mongoose, { Schema, Document, model } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import { env } from 'node:process';
 dotenv.config();
 
 // Define the interface for the user document with your custom methods
@@ -148,8 +147,9 @@ userSchema.pre('save', async function (next) {
 });
 
 // Custom instance method to check if the password is correct
-userSchema.methods.isPasswordCorrect = async function (password: string) {
-  return bcrypt.compare(password, this.password);
+// Custom instance method to check if the password is correct
+userSchema.methods['isPasswordCorrect'] = async function (password: string) {
+  return bcrypt.compare(password, this['password']);
 };
 
 /**
@@ -160,25 +160,39 @@ userSchema.methods.isPasswordCorrect = async function (password: string) {
  * @returns {string} - Returns the generated JWT as a string.
  * @throws {Error} - Throws an error if token generation fails.
  */
-userSchema.methods.generateAccessToken = function () {
+/**
+ * Instance method to generate a JSON Web Token (JWT) for the user.
+ *
+ * @function generateAccessToken
+ * @memberof module:Models/UserSchema
+ * @returns {string} - Returns the generated JWT as a string.
+ * @throws {Error} - Throws an error if token generation fails.
+ */
+userSchema.methods.generateAccessToken = function (): string {
   const payload = {
-    _id: this.id,
+    _id: this._id,
     email: this.email,
     username: this.username,
     role: this.role,
   };
 
-  const secret: any = process.env.ACCESS_TOKEN_SECRET;
-  const expiry: any = process.env.ACCESS_TOKEN_EXPIRY;
+  const secret = process.env.ACCESS_TOKEN_SECRET;
+  const expiry = process.env.ACCESS_TOKEN_EXPIRY;
   if (!secret) {
     throw new Error('ACCESS_TOKEN_SECRET is not defined');
   }
+  if (!expiry) {
+    throw new Error('ACCESS_TOKEN_EXPIRY is not defined');
+  }
 
-  return jwt.sign(payload, secret, {
-    expiresIn: expiry,
-  });
+  return jwt.sign(
+    payload,
+    secret as jwt.Secret,
+    {
+      expiresIn: expiry,
+    } as jwt.SignOptions
+  );
 };
-
 /**
  * Instance method to generate a JSON Web Token (JWT) for the user.
  *
@@ -187,20 +201,28 @@ userSchema.methods.generateAccessToken = function () {
  * @returns {string} - Returns the generated JWT as a string.
  * @throws {Error} - Throws an error if token generation fails.
  */
-userSchema.methods.generateRefreshToken = function () {
+/**
+ * Instance method to generate a JSON Web Token (JWT) for the user.
+ *
+ * @function generateRefershToken
+ * @memberof module:Models/UserSchema
+ * @returns {string} - Returns the generated JWT as a string.
+ * @throws {Error} - Throws an error if token generation fails.
+ */
+userSchema.methods['generateRefreshToken'] = function () {
   const payload = {
-    _id: this.id,
+    _id: this['id'],
   };
 
-  const secret: any = process.env.ACCESS_TOKEN_SECRET;
-  const expiry: any = process.env.ACCESS_TOKEN_EXPIRY;
+  const secret = process.env['ACCESS_TOKEN_SECRET'];
+  const expiry = process.env['ACCESS_TOKEN_EXPIRY'];
   if (!secret) {
     throw new Error('ACCESS_TOKEN_SECRET is not defined');
   }
 
   return jwt.sign(payload, secret, {
     expiresIn: expiry,
-  });
+  } as jwt.SignOptions);
 };
 
 /**
