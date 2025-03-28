@@ -1,6 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
-import { User } from "./user.model.js";
-import { Song } from "./song.model.js";
+import mongoose, { Schema, Document } from 'mongoose';
 
 /**
  * Interface for Album Document
@@ -20,7 +18,7 @@ const albumSchema = new Schema<IAlbum>(
   {
     artist: {
       type: Schema.Types.ObjectId,
-      ref: "User", // Reference to Artist (User)
+      ref: 'User', // Reference to Artist (User)
       required: true,
     },
     title: {
@@ -43,11 +41,11 @@ const albumSchema = new Schema<IAlbum>(
     songs: [
       {
         type: Schema.Types.ObjectId,
-        ref: "Song", // Reference to Songs in Album
+        ref: 'Song', // Reference to Songs in Album
       },
     ],
   },
   { timestamps: true } // Adds createdAt and updatedAt automatically
 );
 
-export const Album = mongoose.model<IAlbum>("Album", albumSchema);
+export const Album = mongoose.model<IAlbum>('Album', albumSchema);

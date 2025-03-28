@@ -1,4 +1,4 @@
-import mongoose,{Schema} from "mongoose";
+import mongoose, { Schema } from 'mongoose';
 /**
  * @typedef PlaylistSong
  * @property {mongoose.Types.ObjectId} playlistId - The playlist this song belongs to (References Playlist model).
@@ -8,7 +8,7 @@ import mongoose,{Schema} from "mongoose";
 const playlistSongSchema = new Schema({
   playlistId: { type: Schema.Types.ObjectId, ref: 'Playlist', required: true },
   songId: { type: Schema.Types.ObjectId, ref: 'Song', required: true },
-  addedAt: { type: Date, default: Date.now }
+  addedAt: { type: Date, default: Date.now },
 });
 
 module.exports = mongoose.model('PlaylistSong', playlistSongSchema);

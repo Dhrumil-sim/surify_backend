@@ -1,12 +1,11 @@
 import mongoose ,{Schema} from "mongoose";
-import { User } from "./user.model.js";
 
 const notificationSchema = new Schema(
     
     {
        user_id : {
             type: Schema.Types.ObjectId,
-            ref: User,
+            ref: 'User',
             required: true,
        },
 

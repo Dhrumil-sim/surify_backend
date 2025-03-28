@@ -1,24 +1,13 @@
-import { FileArray, File } from 'multer';
-// declare global {
-//     namespace NodeJS {
-//         interface ProcessEnv {
-//             ACCESS_TOKEN_EXPIRY: string;
-//             ACCESS_TOKEN_SECRET: String;
-//             REFRESH_TOKEN_SECRET: String;
-//             REFRESH_TOKEN_EXPIRY: String;
-//         }
-//     }
-// }
+// src/types/env.d.ts
+import { Secret } from 'jsonwebtoken';
+
 declare global {
-    namespace NodeJS {
-      interface ProcessEnv {
-        [key: string]: string | undefined;
-        PORT: string;
-        DATABASE_URL: string;
-        ACCESS_TOKEN_EXPIRY: string;
-        ACCESS_TOKEN_SECRET: String;
-        REFRESH_TOKEN_SECRET: String;
-        REFRESH_TOKEN_EXPIRY: String;
-      }
+  namespace NodeJS {
+    interface ProcessEnv {
+      ACCESS_TOKEN_SECRET: Secret;
+      ACCESS_TOKEN_EXPIRY: Secret;
     }
   }
+}
+
+export {};

@@ -1,5 +1,4 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { User } from './user.model.js';
 
 /**
  * Interface representing a Song document in MongoDB.
