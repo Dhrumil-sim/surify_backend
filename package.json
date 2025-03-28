@@ -8,12 +8,16 @@
     "start": "nodemon --exec node --loader ts-node/esm src/index.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "docs": "jsdoc -c jsdoc.json"
+    "docs": "jsdoc -c jsdoc.json",
+    "prepare": "husky install"
   },
   "lint-staged": {
-    "*.js": [
+    "src/**/*.{ts,tsx,js,jsx}": [
       "eslint --fix",
-      "git add"
+      "prettier --write"
+    ],
+    "src/**/*.{json,css,md}": [
+      "prettier --write"
     ]
   },
   "keywords": [
