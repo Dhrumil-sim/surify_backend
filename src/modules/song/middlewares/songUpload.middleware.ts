@@ -1,5 +1,7 @@
 import multer from 'multer';
 import path from 'path';
+import { ApiError } from '../../../utils/ApiError.js';
+import { StatusCodes } from 'http-status-codes';
 
 // Set storage engine
 const storage = multer.diskStorage({
@@ -45,7 +47,12 @@ function checkImageType(
   if (mimetype && extname) {
     return cb(null, true);
   } else {
-    cb(new Error('Error: Images Only!'));
+    cb(
+      new ApiError(
+        StatusCodes.UNSUPPORTED_MEDIA_TYPE,
+        'Only Images are allowed'
+      )
+    );
   }
 }
 
@@ -61,7 +68,12 @@ function checkAudioType(
   if (extname) {
     return cb(null, true);
   } else {
-    cb(new Error('Error: Audio Only!'));
+    cb(
+      new ApiError(
+        StatusCodes.UNSUPPORTED_MEDIA_TYPE,
+        'Only Music files are allowed'
+      )
+    );
   }
 }
 
