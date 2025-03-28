@@ -1,7 +1,6 @@
 import dotenv from 'dotenv';
 import connectDB from './db/index.js';
 import app from './app.js';
-import { Request, Response } from 'express';
 import { console } from 'inspector';
 dotenv.config();
 
