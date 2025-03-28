@@ -1,9 +1,7 @@
 import multer from 'multer';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { FileFilterCallback } from 'multer';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 // Set storage engine
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -24,19 +22,26 @@ const upload = multer({
 });
 
 // Check file type
-function checkFileType(file: any, cb: Function) {
-  // Allowed ext
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+const checkFileType = (
+  file: Express.Multer.File,
+  cb: FileFilterCallback
+): void => {
+  // Allowed file extensions
   const filetypes = /jpeg|jpg|png|gif/;
-  // Check ext
+
+  // Check file extension
   const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-  // Check mime
+
+  // Check MIME type
   const mimetype = filetypes.test(file.mimetype);
 
   if (mimetype && extname) {
-    return cb(null, true);
+    // Accept the file
+    cb(null, true);
   } else {
-    cb('Error: Images Only!');
+    // Reject the file with an error message
+    cb(new Error('Error: Images Only!'));
   }
-}
-
+};
 export { upload };
