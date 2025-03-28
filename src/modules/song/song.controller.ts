@@ -80,6 +80,15 @@ class SongController {
       }
     }
   );
+
+  static getSongById = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const songId = '' + req.params.songId;
+      console.log(songId);
+      const song = await SongService.getSongById(songId);
+      res.status(200).json({ song });
+    }
+  );
 }
 
 export default SongController;

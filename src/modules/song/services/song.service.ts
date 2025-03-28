@@ -44,6 +44,19 @@ class SongService {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Music Not Found');
     }
   }
+
+  static async getSongById(songId: string): Promise<ISong> {
+    try {
+      const objectId = new mongoose.Types.ObjectId(songId);
+      const song = await Song.findById(objectId);
+      if (!song) {
+        throw new ApiError(StatusCodes.NOT_FOUND, 'Music not found');
+      }
+      return song;
+    } catch {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Music not found');
+    }
+  }
 }
 
 export default SongService;
