@@ -26,6 +26,6 @@ router.put(
   validateRequest(songValidationSchema),
   SongController.updateSong
 );
-router.get('/search/:songId', verifyJWT, SongController.getSongById);
+router.get('/:songId', verifyJWT, SongController.getSongById);
 router.get('/', verifyJWT, SongController.getAllSong);
 export default router;
