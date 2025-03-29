@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { Request, Response, NextFunction } from 'express';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import SongMetaData from './utils/songMetadata.util.js';
@@ -8,7 +7,7 @@ import { ApiError } from '../../utils/ApiError.js';
 import { StatusCodes } from 'http-status-codes';
 import { ISong } from '../../models/song.model.js';
 import { ApiResponse } from '../../utils/ApiResponse.js';
-interface AuthenticatedRequest extends Request {
+export interface AuthenticatedRequest extends Request {
   cookies: { accessToken?: string; refreshToken?: string }; // Define cookies with accessToken
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   user?: any;
