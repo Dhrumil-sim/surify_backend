@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Request, Response, NextFunction } from 'express';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import SongMetaData from './utils/songMetadata.util.js';
