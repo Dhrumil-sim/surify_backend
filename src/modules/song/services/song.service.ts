@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import mongoose from 'mongoose';
 import { Song, ISong } from '../../../models/song.model.js';
 import { ApiError } from '../../../utils/ApiError.js';
