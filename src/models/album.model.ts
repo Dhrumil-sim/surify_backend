@@ -7,11 +7,12 @@ export interface IAlbum extends Document {
   artist: mongoose.Types.ObjectId;
   title: string;
   genre: string[];
-  release_date: Date;
-  cover_pic: string;
+  releaseDate: Date;
+  coverPicture: string;
   songs: mongoose.Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
+  deletedAt: Date;
 }
 
 const albumSchema = new Schema<IAlbum>(
@@ -30,11 +31,11 @@ const albumSchema = new Schema<IAlbum>(
       type: [String],
       required: true,
     },
-    release_date: {
+    releaseDate: {
       type: Date,
       required: true,
     },
-    cover_pic: {
+    coverPicture: {
       type: String,
       required: true,
     },
@@ -44,6 +45,10 @@ const albumSchema = new Schema<IAlbum>(
         ref: 'Song', // Reference to Songs in Album
       },
     ],
+    deletedAt: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true } // Adds createdAt and updatedAt automatically
 );
