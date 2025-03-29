@@ -3,6 +3,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import userRouter from './routes/user.routes.js';
 import songRouter from './routes/song.routes.js';
+import albumRouter from './routes/album.routes.js';
 import { errorHandler } from './middlewares/errorHandler/errorHandler.js';
 
 class App {
@@ -28,6 +29,7 @@ class App {
   private setRoutes(): void {
     this.app.use('/api/user', userRouter);
     this.app.use('/api/song', songRouter);
+    this.app.use('/api/album', albumRouter);
   }
 
   private setErrorHandler(): void {
