@@ -86,8 +86,9 @@ class SongController {
   static getSongById = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       const songId = '' + req.params.songId;
-      console.log(songId);
+
       const song = await SongService.getSongById(songId);
+      console.log(song);
       res.status(200).json({ song });
     }
   );
@@ -148,12 +149,21 @@ class SongController {
   static deleteSong = asyncHandler(
     async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
       const songId = req.params.songId;
+      const { role, id: artistId } = req.user;
+      console.log('Artist id :', artistId);
+      const song = await SongService.getSongById(songId);
+      if (role !== 'artist' && !song.artist.equals(artistId)) {
+        throw new ApiError(
+          StatusCodes.UNAUTHORIZED,
+          'Only Artist can delete their own song'
+        );
+      }
       try {
         await SongService.deleteSong(songId);
         return res
           .status(200)
           .json(
-            new ApiResponse(StatusCodes.OK, {}, 'User Deleted Successfully')
+            new ApiResponse(StatusCodes.OK, {}, 'Song Deleted Successfully')
           );
       } catch (error) {
         return next(error);

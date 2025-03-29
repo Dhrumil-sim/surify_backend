@@ -51,13 +51,13 @@ class SongService {
   static async getSongById(songId: string): Promise<ISong> {
     try {
       const objectId = new mongoose.Types.ObjectId(songId);
-      const song = await Song.findById(objectId, { deletedAt: null });
+      const song = await Song.findById(objectId).where({ deletedAt: null });
       if (!song) {
         throw new ApiError(StatusCodes.NOT_FOUND, 'Music not found');
       }
       return song;
-    } catch {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Music not found');
+    } catch (error) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Music not found' + error);
     }
   }
 
@@ -88,8 +88,9 @@ class SongService {
     if (!songExists) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Song is not found');
     }
-    songExists.deletedAt = new Date();
-    await songExists.save();
+    await Song.findByIdAndUpdate(songId, {
+      deletedAt: new Date(),
+    });
   }
 }
 
