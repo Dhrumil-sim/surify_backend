@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 /**
- * Interface for Album Document
+ * Interface representing an Album document in MongoDB.
  */
 export interface IAlbum extends Document {
   artist: mongoose.Types.ObjectId;
@@ -10,16 +10,17 @@ export interface IAlbum extends Document {
   releaseDate: Date;
   coverPicture: string;
   songs: mongoose.Types.ObjectId[];
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: Date;
+  deletedAt?: Date | null;
 }
 
+/**
+ * Mongoose schema for the Album model.
+ */
 const albumSchema = new Schema<IAlbum>(
   {
     artist: {
       type: Schema.Types.ObjectId,
-      ref: 'User', // Reference to Artist (User)
+      ref: 'User', // Reference to the 'User' model
       required: true,
     },
     title: {
@@ -42,15 +43,20 @@ const albumSchema = new Schema<IAlbum>(
     songs: [
       {
         type: Schema.Types.ObjectId,
-        ref: 'Song', // Reference to Songs in Album
+        ref: 'Song', // Reference to the 'Song' model
       },
     ],
     deletedAt: {
       type: Date,
-      default: null,
+      default: null, // Ensures soft deletion functionality
     },
   },
-  { timestamps: true } // Adds createdAt and updatedAt automatically
+  {
+    timestamps: true, // Adds createdAt and updatedAt timestamps
+  }
 );
 
+/**
+ * Mongoose model for the Album schema.
+ */
 export const Album = mongoose.model<IAlbum>('Album', albumSchema);
