@@ -18,8 +18,8 @@ class App {
   }
 
   private setMiddlewares(): void {
-    this.app.use(express.json({ limit: '16kb' }));
-    this.app.use(express.urlencoded({ extended: true, limit: '16kb' }));
+    this.app.use(express.json({ limit: '5mb' }));
+    this.app.use(express.urlencoded({ extended: true, limit: '5mb' }));
     this.app.use(cors({ origin: process.env['CORS_ORIGIN'] }));
     this.app.use(express.static('public'));
     this.app.set('view engine', 'ejs');
