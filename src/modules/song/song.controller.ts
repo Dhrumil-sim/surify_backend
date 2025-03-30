@@ -14,6 +14,8 @@ export interface AuthenticatedRequest extends Request {
   files: {
     coverPicture?: Express.Multer.File[]; // Array of image files
     filePath?: Express.Multer.File[]; // Array of audio files (filePath as array of files)
+    songCovers?: Express.Multer.File[];
+    songFiles?: Express.Multer.File[];
   };
 }
 
