@@ -22,7 +22,8 @@ class SongService {
     releaseDate: Date,
     duration: number,
     coverPicture: string,
-    filePath: string
+    filePath: string,
+    album?: mongoose.Types.ObjectId
   ): Promise<ISong> {
     const newSong = await Song.create({
       artist,
@@ -32,6 +33,7 @@ class SongService {
       duration,
       coverPicture,
       filePath,
+      album,
     });
     return newSong;
   }
@@ -91,6 +93,44 @@ class SongService {
     await Song.findByIdAndUpdate(songId, {
       deletedAt: new Date(),
     });
+  }
+
+  static async createMultipleSongs(
+    artist: mongoose.Types.ObjectId,
+    album: mongoose.Types.ObjectId,
+    songs: {
+      title: string;
+      genre: string[];
+      releaseDate: Date;
+      duration: number;
+      coverPicture: string;
+      filePath: string;
+    }[]
+  ): Promise<ISong[]> {
+    try {
+      // Use `map` to create an array of song creation promises
+      const createdSongs = await Promise.all(
+        songs.map((song) =>
+          this.createSong(
+            artist,
+            song.title,
+            song.genre,
+            song.releaseDate,
+            song.duration,
+            song.coverPicture,
+            song.filePath,
+            album
+            // Pass the albumId to the createSong function
+          )
+        )
+      );
+      return createdSongs;
+    } catch (error) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'Failed to create songs: ' + error
+      );
+    }
   }
 }
 
