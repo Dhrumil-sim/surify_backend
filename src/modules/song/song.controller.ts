@@ -6,13 +6,16 @@ import SongService from './services/song.service.js';
 import { ApiError } from '../../utils/ApiError.js';
 import { StatusCodes } from 'http-status-codes';
 import { ISong } from '../../models/song.model.js';
-interface AuthenticatedRequest extends Request {
+import { ApiResponse } from '../../utils/ApiResponse.js';
+export interface AuthenticatedRequest extends Request {
   cookies: { accessToken?: string; refreshToken?: string }; // Define cookies with accessToken
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   user?: any;
   files: {
     coverPicture?: Express.Multer.File[]; // Array of image files
     filePath?: Express.Multer.File[]; // Array of audio files (filePath as array of files)
+    songCovers?: Express.Multer.File[];
+    songFiles?: Express.Multer.File[];
   };
 }
 
@@ -85,8 +88,9 @@ class SongController {
   static getSongById = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       const songId = '' + req.params.songId;
-      console.log(songId);
+
       const song = await SongService.getSongById(songId);
+      console.log(song);
       res.status(200).json({ song });
     }
   );
@@ -137,6 +141,32 @@ class SongController {
           message: 'Song updated successfully',
           data: updatedSong,
         });
+      } catch (error) {
+        return next(error);
+      }
+    }
+  );
+
+  // soft delete
+  static deleteSong = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+      const songId = req.params.songId;
+      const { role, id: artistId } = req.user;
+      console.log('Artist id :', artistId);
+      const song = await SongService.getSongById(songId);
+      if (role !== 'artist' && !song.artist.equals(artistId)) {
+        throw new ApiError(
+          StatusCodes.UNAUTHORIZED,
+          'Only Artist can delete their own song'
+        );
+      }
+      try {
+        await SongService.deleteSong(songId);
+        return res
+          .status(200)
+          .json(
+            new ApiResponse(StatusCodes.OK, {}, 'Song Deleted Successfully')
+          );
       } catch (error) {
         return next(error);
       }

@@ -3,9 +3,8 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import userRouter from './routes/user.routes.js';
 import songRouter from './routes/song.routes.js';
+import albumRouter from './routes/album.routes.js';
 import { errorHandler } from './middlewares/errorHandler/errorHandler.js';
-import { ApiError } from './utils/ApiError.js';
-import { StatusCodes } from 'http-status-codes';
 
 class App {
   public app: Application;
@@ -14,13 +13,13 @@ class App {
     this.app = express();
     this.setMiddlewares();
     this.setRoutes();
-    this.handleUndefinedRoutes();
+
     this.setErrorHandler();
   }
 
   private setMiddlewares(): void {
-    this.app.use(express.json({ limit: '16kb' }));
-    this.app.use(express.urlencoded({ extended: true, limit: '16kb' }));
+    this.app.use(express.json({ limit: '5mb' }));
+    this.app.use(express.urlencoded({ extended: true, limit: '5mb' }));
     this.app.use(cors({ origin: process.env['CORS_ORIGIN'] }));
     this.app.use(express.static('public'));
     this.app.set('view engine', 'ejs');
@@ -30,16 +29,11 @@ class App {
   private setRoutes(): void {
     this.app.use('/api/user', userRouter);
     this.app.use('/api/song', songRouter);
+    this.app.use('/api/album', albumRouter);
   }
 
   private setErrorHandler(): void {
     this.app.use(errorHandler);
-  }
-
-  private handleUndefinedRoutes(): void {
-    this.app.use('*', () => {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Not found');
-    });
   }
 
   public getServer(): Application {
