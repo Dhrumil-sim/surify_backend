@@ -13,6 +13,7 @@ const errorHandler = (
   );
   if (err.errors.length > 0) {
     console.error('Details:', JSON.stringify(err.errors, null, 2));
+    console.error('Data:', JSON.stringify(err.data, null, 2));
   }
 
   res.status(err.statusCode).json({
@@ -20,6 +21,7 @@ const errorHandler = (
     errorCode: err.errorCode,
     message: err.message,
     errors: err.errors,
+    data: err.data,
   });
 };
 
