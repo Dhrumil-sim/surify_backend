@@ -1,6 +1,8 @@
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { ApiError } from '../../../utils/ApiError.js';
+import { StatusCodes } from 'http-status-codes';
 
 // Function to create directory if it doesn't exist
 const ensureDirectoryExists = (dir) => {
@@ -35,7 +37,13 @@ const fileFilter = (req, file, cb) => {
   ) {
     cb(null, true);
   } else {
-    cb(new Error('Only image and audio files are allowed'), false);
+    cb(
+      new ApiError(
+        StatusCodes.UNSUPPORTED_MEDIA_TYPE,
+        'Only image and audio files are allowed'
+      ),
+      false
+    );
   }
 };
 
