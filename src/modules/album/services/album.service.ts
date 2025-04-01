@@ -3,6 +3,9 @@ import { Song, ISong } from '../../../models/song.model.js';
 import SongMetaData from '../../song/utils/songMetadata.util.js';
 import mongoose from 'mongoose';
 import { AlbumValidation } from '../utils/albumAndSongValidation.js';
+import { asyncHandler } from '../../../utils/asyncHandler.js';
+import { AuthenticatedRequest } from '../../song/song.controller.js';
+import { NextFunction } from 'express';
 
 export class AlbumService {
   static async createAlbum(albumData: {
@@ -96,4 +99,13 @@ export class AlbumService {
 
     return newAlbum;
   }
+
+  static getArtistAlbum = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+      AlbumValidation.isArtist(req, res, next);
+      const artistId = req.user?._id;
+      const artistAlbums = await Album.find().where({ artist: artistId });
+      console.log(artistAlbums);
+    }
+  );
 }

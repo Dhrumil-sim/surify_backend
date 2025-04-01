@@ -40,5 +40,5 @@ router.post(
   validateRequest(albumSchema),
   AlbumController.createAlbum
 );
-
+router.get('/', verifyJWT, AlbumController.getArtistAlbums);
 export default router;

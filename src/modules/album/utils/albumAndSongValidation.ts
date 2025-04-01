@@ -5,6 +5,7 @@ import { StatusCodes } from 'http-status-codes';
 import { asyncHandler } from '../../../utils/asyncHandler.js';
 
 import { AuthenticatedRequest } from '../../song/song.controller.js';
+import { NextFunction, Response } from 'express';
 
 // Album validation schema
 export const albumSchema = Joi.object({
@@ -198,22 +199,25 @@ export class AlbumValidation {
   }
 
   // checking user is artist or not
-  static isArtist = asyncHandler(async (req: AuthenticatedRequest) => {
-    const role = req.user?.role;
-    if (role !== 'artist') {
-      throw new ApiError(
-        StatusCodes.UNAUTHORIZED,
-        'INVALID_USER',
-        'Only Artist can get their Data',
-        [],
-        [
-          {
-            expectedField: 'artistRole',
-            description:
-              'Record which you want to get.. is meant to Artist Only .. !!!',
-          },
-        ]
-      );
+  static isArtist = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+      const role = req.user?.role;
+      if (role !== 'artist') {
+        throw new ApiError(
+          StatusCodes.UNAUTHORIZED,
+          'INVALID_USER',
+          'Only Artist can get their Data',
+          [],
+          [
+            {
+              expectedField: 'artistRole',
+              description:
+                'Record which you want to get.. is meant to Artist Only .. !!!',
+            },
+          ]
+        );
+      }
+      next();
     }
-  });
+  );
 }
