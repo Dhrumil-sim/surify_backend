@@ -1,5 +1,7 @@
+import { StatusCodes } from 'http-status-codes';
 import { Album, IAlbum } from '../../../models/album.model.js';
 import { Song, ISong } from '../../../models/song.model.js';
+import { ApiError } from '../../../utils/ApiError.js';
 import SongMetaData from '../../song/utils/songMetadata.util.js';
 
 import mongoose from 'mongoose';
@@ -34,7 +36,11 @@ export class AlbumService {
       parsedSongs.length !== songFiles.length ||
       parsedSongs.length !== songCovers.length
     ) {
-      throw new Error('Each song must have a corresponding file and cover');
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'SONG_MISSING',
+        'Each song must have a corresponding file and cover'
+      );
     }
 
     // Process each song and extract metadata
@@ -44,7 +50,11 @@ export class AlbumService {
         const songCover = songCovers[index]?.path;
 
         if (!songFile || !songCover) {
-          throw new Error(`Missing file or cover for song: ${song.title}`);
+          throw new ApiError(
+            StatusCodes.BAD_REQUEST,
+            'FILE_COVER_MISSING',
+            `Missing file or cover for song: ${song.title}`
+          );
         }
 
         let duration = 0;
