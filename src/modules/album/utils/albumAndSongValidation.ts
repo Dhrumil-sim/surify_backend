@@ -1,4 +1,6 @@
 import Joi from 'joi';
+import { ApiError } from '../../../utils/ApiError.js';
+import { StatusCodes } from 'http-status-codes';
 
 // Album validation schema
 export const albumSchema = Joi.object({
@@ -84,3 +86,110 @@ export const albumSchema = Joi.object({
       'any.required': `"songs" is required`,
     }),
 });
+
+export class AlbumValidation {
+  /**
+   * Validate required fields in album creation.
+   */
+  static validateRequiredFields(albumData: {
+    title?: string;
+    genre?: string;
+    songs?: string | { title: string; genre: string[] }[];
+    coverPicture?: string;
+    songFiles?: Express.Multer.File[];
+    songCovers?: Express.Multer.File[];
+  }) {
+    const { coverPicture, songs } = albumData;
+
+    if (!coverPicture) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'COVER_MISSING',
+        'Album cover picture is required'
+      );
+    }
+
+    if (!songs) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'SONGS_MISSING',
+        'Songs data is required'
+      );
+    }
+  }
+
+  /**
+   * Parse JSON fields safely.
+   */
+  static parseJsonField<T>(data: string | T): T {
+    try {
+      return typeof data === 'string' ? JSON.parse(data) : data;
+    } catch {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'INVALID_JSON',
+        'Invalid JSON format provided'
+      );
+    }
+  }
+
+  /**
+   * Validate song, file, and cover counts match.
+   */
+  static validateSongFileCoverMatch(
+    parsedSongs: { title: string; genre: string[] }[],
+    songFiles: Express.Multer.File[],
+    songCovers: Express.Multer.File[]
+  ) {
+    if (
+      parsedSongs.length !== songFiles.length ||
+      parsedSongs.length !== songCovers.length
+    ) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'SONG_FILE_MISMATCH',
+        'Each song must have a corresponding file and cover',
+        [
+          {
+            field: 'songs',
+            message: 'Mismatch between songs and uploaded files',
+          },
+          { field: 'songFiles', message: 'Ensure each song has a file' },
+          { field: 'songCovers', message: 'Ensure each song has a cover' },
+        ],
+        [
+          {
+            expectedField: 'songs',
+            description: `Expected ${parsedSongs.length} songs, but received ${songFiles.length} song files and ${songCovers.length} song covers`,
+          },
+          {
+            expectedField: 'songFiles',
+            description: `Expected ${parsedSongs.length} song files, but received ${songFiles.length}`,
+          },
+          {
+            expectedField: 'songCovers',
+            description: `Expected ${parsedSongs.length} song covers, but received ${songCovers.length}`,
+          },
+        ]
+      );
+    }
+  }
+
+  /**
+   * Validate file existence.
+   */
+  static validateFileExistence(
+    file: Express.Multer.File | undefined,
+    fieldName: string,
+    errorMessage: string
+  ) {
+    if (!file) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'FILE_MISSING',
+        errorMessage,
+        [{ field: fieldName, message: errorMessage }]
+      );
+    }
+  }
+}

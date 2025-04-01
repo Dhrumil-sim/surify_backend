@@ -1,10 +1,8 @@
-import { StatusCodes } from 'http-status-codes';
 import { Album, IAlbum } from '../../../models/album.model.js';
 import { Song, ISong } from '../../../models/song.model.js';
-import { ApiError } from '../../../utils/ApiError.js';
 import SongMetaData from '../../song/utils/songMetadata.util.js';
-
 import mongoose from 'mongoose';
+import { AlbumValidation } from '../utils/albumAndSongValidation.js';
 
 export class AlbumService {
   static async createAlbum(albumData: {
@@ -19,43 +17,38 @@ export class AlbumService {
     const { title, genre, songs, coverPicture, songFiles, songCovers, userId } =
       albumData;
 
-    if (!coverPicture) throw new Error('Album cover picture is required');
-    if (!songs) throw new Error('Songs data is required');
+    // ✅ Step 1: Validate required fields
+    AlbumValidation.validateRequiredFields(albumData);
 
-    // Parse genre and songs data if needed
-    const parsedGenre: string[] = Array.isArray(genre)
-      ? genre
-      : JSON.parse(genre);
-    const parsedSongs: { title: string; genre: string[] }[] = Array.isArray(
-      songs
-    )
-      ? songs
-      : JSON.parse(songs);
+    // ✅ Step 2: Parse JSON fields
+    const parsedGenre: string = AlbumValidation.parseJsonField(genre);
+    const parsedSongs: { title: string; genre: string[] }[] =
+      AlbumValidation.parseJsonField(songs);
 
-    if (
-      parsedSongs.length !== songFiles.length ||
-      parsedSongs.length !== songCovers.length
-    ) {
-      throw new ApiError(
-        StatusCodes.BAD_REQUEST,
-        'SONG_MISSING',
-        'Each song must have a corresponding file and cover'
-      );
-    }
+    // ✅ Step 3: Validate song-file-cover count
+    AlbumValidation.validateSongFileCoverMatch(
+      parsedSongs,
+      songFiles,
+      songCovers
+    );
 
-    // Process each song and extract metadata
+    // ✅ Step 4: Process each song and extract metadata
     const songsWithFiles: Partial<ISong>[] = await Promise.all(
       parsedSongs.map(async (song, index) => {
         const songFile = songFiles[index]?.path;
         const songCover = songCovers[index]?.path;
 
-        if (!songFile || !songCover) {
-          throw new ApiError(
-            StatusCodes.BAD_REQUEST,
-            'FILE_COVER_MISSING',
-            `Missing file or cover for song: ${song.title}`
-          );
-        }
+        // ✅ Step 5: Validate each song has a file and cover
+        AlbumValidation.validateFileExistence(
+          songFiles[index],
+          'songFiles',
+          `Missing file for song: ${song.title}`
+        );
+        AlbumValidation.validateFileExistence(
+          songCovers[index],
+          'songCovers',
+          `Missing cover for song: ${song.title}`
+        );
 
         let duration = 0;
         try {
@@ -76,7 +69,7 @@ export class AlbumService {
       })
     );
 
-    // Create the album in the database
+    // ✅ Step 6: Create album in database
     const newAlbum = await Album.create({
       artist: new mongoose.Types.ObjectId(userId),
       title,
@@ -85,7 +78,7 @@ export class AlbumService {
       coverPicture,
     });
 
-    // Create songs and link them to the album
+    // ✅ Step 7: Create songs and link them to the album
     const createdSongs = await Promise.all(
       songsWithFiles.map(async (song) => {
         const newSong = await Song.create({
@@ -97,7 +90,7 @@ export class AlbumService {
       })
     );
 
-    // Update album with song IDs
+    // ✅ Step 8: Update album with song IDs
     newAlbum.songs = createdSongs as IAlbum['songs'];
     await newAlbum.save();
 
