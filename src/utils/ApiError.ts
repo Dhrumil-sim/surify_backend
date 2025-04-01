@@ -5,19 +5,25 @@ interface ErrorDetail {
   message: string;
 }
 
+// Define DataDetail type properly
+interface DataDetail {
+  expectedField: string;
+  description: string;
+}
+
 class ApiError extends Error {
   statusCode: number;
   errorCode: string;
   success: boolean;
   errors: ErrorDetail[];
-  data: unknown; // Can be used to store any type of response data (specific to your needs)
+  data: DataDetail[]; // ✅ Properly typed data as an array of objects
 
   constructor(
     statusCode: number = StatusCodes.INTERNAL_SERVER_ERROR,
     errorCode: string = 'INTERNAL_ERROR',
     message: string = getReasonPhrase(statusCode),
     errors: ErrorDetail[] = [],
-    data: unknown = null, // The data field can hold any value, but specifying `unknown` is safer than `any`
+    data: DataDetail[] = [], // ✅ Ensures it's an array of { expectedField, description }
     stack: string = ''
   ) {
     super(message);
@@ -35,4 +41,4 @@ class ApiError extends Error {
   }
 }
 
-export { ApiError };
+export { ApiError, ErrorDetail, DataDetail };
