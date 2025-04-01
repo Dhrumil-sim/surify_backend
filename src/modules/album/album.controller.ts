@@ -4,6 +4,7 @@ import { ApiError } from '../../utils/ApiError.js';
 import { StatusCodes } from 'http-status-codes';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { AuthenticatedRequest } from '../song/song.controller.js';
+import { ApiResponse } from '../../utils/ApiResponse.js';
 
 class AlbumController {
   static createAlbum = asyncHandler(
@@ -30,11 +31,12 @@ class AlbumController {
 
       // Call the service to create album
       const newAlbum = await AlbumService.createAlbum(albumData);
-
-      res.status(StatusCodes.CREATED).json({
-        message: 'Album created successfully',
-        album: newAlbum,
-      });
+      const response = new ApiResponse(
+        StatusCodes.CREATED,
+        newAlbum,
+        'Album created successfully'
+      );
+      res.status(StatusCodes.CREATED).json(response);
     }
   );
 }
