@@ -6,6 +6,8 @@ import { asyncHandler } from '../../../utils/asyncHandler.js';
 
 import { AuthenticatedRequest } from '../../song/song.controller.js';
 import { NextFunction, Response } from 'express';
+import { IAlbum } from '../../../models/album.model.js';
+import { ISong, Song } from '../../../models/song.model.js';
 
 // Album validation schema
 export const albumSchema = Joi.object({
@@ -198,6 +200,20 @@ export class AlbumValidation {
     }
   }
 
+  static async isSongDuplicated(
+    artistId: IAlbum['artist'],
+    songTitle: ISong['title']
+  ): Promise<boolean> {
+    const isSongDuplicated = await Song.find({
+      artist: artistId,
+      title: songTitle,
+    });
+    if (isSongDuplicated.length > 0) {
+      return true;
+    }
+    return false;
+  }
+
   // checking user is artist or not
   static isArtist = asyncHandler(
     async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
@@ -217,6 +233,7 @@ export class AlbumValidation {
           ]
         );
       }
+
       next();
     }
   );

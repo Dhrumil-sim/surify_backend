@@ -5,7 +5,7 @@ import SongService from './services/song.service.js';
 
 import { ApiError } from '../../utils/ApiError.js';
 import { StatusCodes } from 'http-status-codes';
-import { ISong } from '../../models/song.model.js';
+import { ISong, Song } from '../../models/song.model.js';
 import { ApiResponse } from '../../utils/ApiResponse.js';
 export interface AuthenticatedRequest extends Request {
   cookies: { accessToken?: string; refreshToken?: string }; // Define cookies with accessToken
@@ -23,12 +23,21 @@ class SongController {
   static createSong = asyncHandler(
     async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
       const { role, _id: artistId } = req.user; // Extract user details
-
+      const { title } = req.body;
       // Check if the user is an artist
       if (role !== 'artist') {
         return res
           .status(403)
           .json({ message: 'Access denied: Only artists can upload songs' });
+      }
+      const existingSong = await Song.find({ title: title, artist: artistId });
+
+      if (existingSong.length > 0) {
+        throw new ApiError(
+          StatusCodes.CONFLICT,
+          'SONG_ALREADY_EXIST',
+          'Song with given title is already exist'
+        );
       }
       // Add the artist ID to the request body
       req.body.artist = artistId;

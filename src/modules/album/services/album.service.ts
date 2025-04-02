@@ -1,8 +1,11 @@
 import { Album, IAlbum } from '../../../models/album.model.js';
-import { Song, ISong } from '../../../models/song.model.js';
+
 import SongMetaData from '../../song/utils/songMetadata.util.js';
 import mongoose from 'mongoose';
 import { AlbumValidation } from '../utils/albumAndSongValidation.js';
+import SongService from '../../song/services/song.service.js';
+import { ApiError } from '../../../utils/ApiError.js';
+import { StatusCodes } from 'http-status-codes';
 
 export class AlbumService {
   static async createAlbum(albumData: {
@@ -81,11 +84,29 @@ export class AlbumService {
     // ✅ Step 7: Create songs and link them to the album
     const createdSongs = await Promise.all(
       songsWithFiles.map(async (song) => {
-        const newSong = await Song.create({
-          ...song,
-          artist: new mongoose.Types.ObjectId(userId),
-          album: newAlbum._id,
-        });
+        // Refactor here to use the `createSong` method correctly
+        const songDuplication = await AlbumValidation.isSongDuplicated(
+          userId,
+          song.title
+        );
+        console.log(songDuplication);
+        if (songDuplication) {
+          throw new ApiError(
+            StatusCodes.CONFLICT,
+            'SONG_ALREADY_EXIST',
+            `Song is already exist with the given title: ${song.title} and artist`
+          );
+        }
+        const newSong = await SongService.createSong(
+          new mongoose.Types.ObjectId(userId), // artist
+          song.title, // title
+          song.genre, // genre
+          new Date(), // releaseDate
+          song.duration, // duration
+          song.coverPicture, // coverPicture
+          song.filePath, // filePath
+          new mongoose.Types.ObjectId(newAlbum.artist) // album ID
+        );
         return newSong._id;
       })
     );
