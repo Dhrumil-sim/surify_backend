@@ -10,12 +10,15 @@ class ApiResponse<T> {
   ) {
     this.success = statusCode < 400;
 
-    // Pretty-print the data object with 2-space indentation
+    // Format the data object with 2-space indentation
     const formattedData = JSON.stringify(this.data, null, 2);
 
-    // Log the success message and formatted data in green
+    // Determine the appropriate chalk color based on success or failure
+    const log = this.success ? chalk.green : chalk.red;
+
+    // Log the message and formatted data in the chosen color
     console.log(
-      chalk.green(
+      log(
         `ApiResponse: ${this.message} (Status: ${this.statusCode})\nData: ${formattedData}`
       )
     );

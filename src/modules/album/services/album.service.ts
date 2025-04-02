@@ -6,7 +6,7 @@ import { AlbumValidation } from '../utils/albumAndSongValidation.js';
 import { asyncHandler } from '../../../utils/asyncHandler.js';
 import { AuthenticatedRequest } from '../../song/song.controller.js';
 import { NextFunction } from 'express';
-
+import { Response } from 'express';
 export class AlbumService {
   static async createAlbum(albumData: {
     title: string;
