@@ -5,7 +5,7 @@ import userRouter from './routes/user.routes.js';
 import songRouter from './routes/song.routes.js';
 import albumRouter from './routes/album.routes.js';
 import { errorHandler } from './middlewares/errorHandler/errorHandler.js';
-
+import morgan from 'morgan';
 class App {
   public app: Application;
 
@@ -24,6 +24,7 @@ class App {
     this.app.use(express.static('public'));
     this.app.set('view engine', 'ejs');
     this.app.use(cookieParser());
+    this.app.use(morgan(':method :url :status :response-time ms'));
   }
 
   private setRoutes(): void {

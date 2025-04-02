@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ApiError } from '../../utils/ApiError.js';
-
+import chalk from 'chalk';
 const errorHandler = (
   err: ApiError,
   req: Request,
@@ -9,11 +9,17 @@ const errorHandler = (
   next: NextFunction
 ) => {
   console.error(
-    `[${new Date().toISOString()}] ${err.errorCode}: ${err.message}`
+    chalk.red(`[${new Date().toISOString()}] ${err.errorCode}: ${err.message}`)
   );
   if (err.errors.length > 0) {
-    console.error('Details:', JSON.stringify(err.errors, null, 2));
-    console.error('Data:', JSON.stringify(err.data, null, 2));
+    console.error(
+      chalk.yellow('Details:'),
+      chalk.cyan(JSON.stringify(err.errors, null, 2))
+    );
+    console.error(
+      chalk.yellow('Data:'),
+      chalk.cyan(JSON.stringify(err.data, null, 2))
+    );
   }
 
   res.status(err.statusCode).json({
