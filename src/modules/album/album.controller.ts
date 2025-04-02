@@ -6,6 +6,7 @@ import { AuthenticatedRequest } from '../song/song.controller.js';
 import { ApiResponse } from '../../utils/ApiResponse.js';
 import { Response } from 'express';
 import mongoose from 'mongoose';
+
 class AlbumController {
   static createAlbum = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
@@ -44,34 +45,22 @@ class AlbumController {
   static getArtistAlbums = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       // checking about user should be artist
-
-      const artistAlbumsData = await AlbumController.getArtistAlbums;
-      if (!artistAlbumsData) {
+      const artistId = req?.user?._id;
+      const albums = await AlbumService.getArtistAlbum(artistId);
+      if (!albums) {
         throw new ApiError(
           StatusCodes.NOT_FOUND,
           'ALBUM_NOT_FOUND',
-          'Albums not found for the artist',
-          [
-            {
-              field: 'albums',
-              message: "Artist haven't uploaded the album yet ",
-            },
-          ],
-          [
-            {
-              expectedField: 'albums',
-              description: 'Kindly create the album !',
-            },
-          ]
+          'Album is not created by artist yet'
         );
+      } else {
+        const response = new ApiResponse(
+          StatusCodes.OK,
+          albums,
+          'Album Fetched Successfully !!!'
+        );
+        res.status(response.statusCode).json(response);
       }
-      console.log(artistAlbumsData);
-      const response = new ApiResponse(
-        StatusCodes.OK,
-        artistAlbumsData,
-        'Album fetched successfully'
-      );
-      res.status(StatusCodes.OK).json(response);
     }
   );
 }
