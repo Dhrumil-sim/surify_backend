@@ -4,18 +4,19 @@ import { StatusCodes } from 'http-status-codes';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { AuthenticatedRequest } from '../song/song.controller.js';
 import { ApiResponse } from '../../utils/ApiResponse.js';
-
+import { Response } from 'express';
+import mongoose from 'mongoose';
 class AlbumController {
   static createAlbum = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const { userId, role } = req.user; // Get the role and ID of the authenticated user
+      const { _id, role } = req.user; // Get the role and ID of the authenticated user
       if (role !== 'artist') {
         throw new ApiError(
           StatusCodes.UNAUTHORIZED,
           'Only artists can create an album'
         );
       }
-
+      const userId = new mongoose.Types.ObjectId(_id);
       const { title, genre, songs } = req.body;
 
       const albumData = {

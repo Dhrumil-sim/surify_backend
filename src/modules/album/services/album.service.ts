@@ -15,7 +15,7 @@ export class AlbumService {
     coverPicture: string;
     songFiles: Express.Multer.File[];
     songCovers: Express.Multer.File[];
-    userId: string;
+    userId: mongoose.Types.ObjectId;
   }): Promise<IAlbum> {
     const { title, genre, songs, coverPicture, songFiles, songCovers, userId } =
       albumData;
