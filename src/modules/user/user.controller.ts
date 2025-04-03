@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import UserService from './services/userService.js';
-import { ApiError } from '../../utils/ApiError.js';
-import { asyncHandler } from '../../utils/asyncHandler.js';
+import { ApiError, asyncHandler } from '@utils/index.js';
 import JWTService from './services/jwtService.js';
 import { ApiResponse } from '../../utils/ApiResponse.js';
 import { StatusCodes } from 'http-status-codes';

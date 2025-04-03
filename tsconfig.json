@@ -3,6 +3,15 @@
     "esm": true
   },
   "compilerOptions": {
+    "baseUrl": "./src",
+    "paths": {
+      "@models/*": ["models/index.ts"],
+      "@routes/*": ["routes/*"],
+      "@middlewares/*": ["middlewares/*"],
+      "@db/*": ["db/*"],
+      "@utils/*": ["utils/index.ts"],
+      "@config/*": ["config/*"]
+    },
     "module": "ESNext",
     "moduleResolution": "node",
     "target": "ESNext",
