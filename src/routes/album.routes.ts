@@ -6,7 +6,7 @@ import { verifyJWT } from '../middlewares/authHandler/auth.middleware.js';
 import AlbumController from '../modules/album/album.controller.js';
 import { ApiError } from '../utils/ApiError.js';
 import { StatusCodes } from 'http-status-codes';
-import { AuthenticatedRequest } from '../modules/song/song.controller.js';
+import { AuthenticatedRequest } from '../modules/song/controllers/song.controller.js';
 
 const router = Router();
 
