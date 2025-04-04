@@ -1,21 +1,6 @@
-import mongoose, { Schema, Document } from 'mongoose';
-
-/**
- * Interface representing a Song document in MongoDB.
- */
-export interface ISong extends Document {
-  artist: mongoose.Types.ObjectId;
-  title: string;
-  album?: mongoose.Types.ObjectId | null;
-  genre: string[];
-  releaseDate: Date;
-  duration: number;
-  coverPicture: string;
-  filePath: string;
-  fileHash: string;
-  deletedAt?: Date | null;
-}
-
+import { ISong } from 'modules/song/interfaces/song.types.interfaces.js';
+import mongoose from 'mongoose';
+import { Schema } from 'mongoose';
 /**
  * Mongoose schema for the Song model.
  */
