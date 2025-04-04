@@ -1,13 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
-import { asyncHandler } from '../../utils/asyncHandler.js';
-import SongMetaData from './utils/songMetadata.util.js';
-import SongService from './services/song.service.js';
+import { asyncHandler } from '../../../utils/asyncHandler.js';
+import SongMetaData from '../utils/songMetadata.util.js';
+import SongService from '../services/song.service.js';
 
-import { ApiError } from '../../utils/ApiError.js';
+import { ApiError } from '../../../utils/ApiError.js';
 import { StatusCodes } from 'http-status-codes';
-import { ISong, Song } from '../../models/song.model.js';
-import { ApiResponse } from '../../utils/ApiResponse.js';
-import { SongFileHash } from './utils/song.filehash.js';
+import { Song } from '../../../models/song.model.js';
+import { ISong } from '../interfaces/song.types.interfaces.js';
+import { ApiResponse } from '../../../utils/ApiResponse.js';
+import { SongFileHash } from '../utils/songFilehash.util.js';
 export interface AuthenticatedRequest extends Request {
   cookies: { accessToken?: string; refreshToken?: string }; // Define cookies with accessToken
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

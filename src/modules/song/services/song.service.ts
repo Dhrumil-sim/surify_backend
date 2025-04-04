@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
-import { Song, ISong } from '../../../models/song.model.js';
+import { Song } from '../../../models/song.model.js';
+import { ISong } from '../interfaces/song.types.interfaces.js';
 import { ApiError } from '../../../utils/ApiError.js';
 import { StatusCodes } from 'http-status-codes';
 

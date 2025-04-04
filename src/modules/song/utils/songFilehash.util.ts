@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import fs from 'fs';
-import { ISong } from 'models/song.model';
+import { ISong } from '../interfaces/song.types.interfaces';
 export class SongFileHash {
   static fileHash = (
     filePath: ISong['filePath']
