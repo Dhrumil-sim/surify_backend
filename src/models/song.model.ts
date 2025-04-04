@@ -12,6 +12,7 @@ export interface ISong extends Document {
   duration: number;
   coverPicture: string;
   filePath: string;
+  fileHash: string;
   deletedAt?: Date | null;
 }
 
@@ -38,6 +39,11 @@ const songSchema = new Schema<ISong>(
     genre: {
       type: [String],
       required: true,
+    },
+    fileHash: {
+      type: String,
+      required: true,
+      unique: true,
     },
     releaseDate: {
       type: Date,
