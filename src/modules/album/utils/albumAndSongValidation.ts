@@ -4,7 +4,7 @@ import { StatusCodes } from 'http-status-codes';
 
 import { asyncHandler } from '../../../utils/asyncHandler.js';
 
-import { AuthenticatedRequest } from '../../song/song.controller.js';
+import { AuthenticatedRequest } from '../../song/controllers/song.controller.js';
 import { NextFunction, Response } from 'express';
 import { IAlbum } from '../../../models/album.model.js';
 import { ISong, Song } from '../../../models/song.model.js';
