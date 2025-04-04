@@ -5,7 +5,10 @@ import { songValidationSchema } from './validators/songValidator.util.js';
 import { uploadSong } from './middlewares/songUpload.middleware';
 import type { AuthenticatedRequest } from './controllers/song.controller.js';
 import { SongFileHash } from './utils/songFilehash.util.js';
-import type ISong from './interfaces/song.types.interfaces.js';
+import type {
+  ISong,
+  ISongHistory,
+} from './interfaces/song.types.interfaces.js';
 export {
   SongController,
   SongMetaData,
@@ -15,4 +18,5 @@ export {
   SongFileHash,
   ISong,
   AuthenticatedRequest,
+  ISongHistory,
 };
