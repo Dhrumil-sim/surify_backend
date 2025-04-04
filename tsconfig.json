@@ -5,12 +5,15 @@
   "compilerOptions": {
     "baseUrl": "./src",
     "paths": {
-      "@models/*": ["models/index.ts"],
-      "@routes/*": ["routes/*"],
-      "@middlewares/*": ["middlewares/*"],
-      "@db/*": ["db/*"],
-      "@utils/*": ["utils/index.ts"],
-      "@config/*": ["config/*"]
+      "@songModule": ["modules/song/index.ts"],
+      "@userModule": ["modules/user/index.ts"],
+      "@albumModule": ["modules/album/index.ts"],
+      "@models": ["models/index.ts"],
+      "@routes": ["routes/index.ts"],
+      "@middlewares": ["middlewares/index.ts"],
+      "@db": ["db/*"],
+      "@utils": ["utils/index.ts"],
+      "@config": ["config/*"]
     },
     "module": "ESNext",
     "moduleResolution": "node",

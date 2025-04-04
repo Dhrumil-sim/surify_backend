@@ -1,6 +1,6 @@
 import multer from 'multer';
 import path from 'path';
-import { ApiError } from '../../../utils/ApiError.js';
+import { ApiError } from '@utils';
 import { StatusCodes } from 'http-status-codes';
 
 // Set storage engine

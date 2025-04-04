@@ -1,10 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import UserService from './services/userService.js';
-import { ApiError, asyncHandler } from '@utils/index.js';
-import JWTService from './services/jwtService.js';
-import { ApiResponse } from '../../utils/ApiResponse.js';
+import { UserService } from '@userModule';
+import { ApiError, asyncHandler, ApiResponse } from '@utils';
+import { JWTService } from '@userModule';
 import { StatusCodes } from 'http-status-codes';
-import { User } from '../../models/user.model.js';
+import { User } from '@models';
 import Jwt from 'jsonwebtoken';
 
 interface AuthenticatedRequest extends Request {

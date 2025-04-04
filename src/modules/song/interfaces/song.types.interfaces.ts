@@ -3,7 +3,7 @@ import mongoose, { Document } from 'mongoose';
 /**
  * Interface representing a Song document in MongoDB.
  */
-export interface ISong extends Document {
+interface ISong extends Document {
   artist: mongoose.Types.ObjectId;
   title: string;
   album?: mongoose.Types.ObjectId | null;
@@ -15,3 +15,5 @@ export interface ISong extends Document {
   fileHash: string;
   deletedAt?: Date | null;
 }
+
+export default ISong;

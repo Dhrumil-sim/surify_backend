@@ -1,9 +1,7 @@
 import express, { Application } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import userRouter from './routes/user.routes.js';
-import songRouter from './routes/song.routes.js';
-import albumRouter from './routes/album.routes.js';
+import { userRouter, albumRouter, songRouter } from '@routes';
 import { errorHandler } from './middlewares/errorHandler/errorHandler.js';
 import morgan from 'morgan';
 class App {

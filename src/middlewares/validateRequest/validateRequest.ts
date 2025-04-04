@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
-import { ApiError } from '../../utils/ApiError.js';
+import { ApiError } from '@utils';
 import { StatusCodes } from 'http-status-codes';
 
 export const validateRequest = (schema: Joi.ObjectSchema) => {

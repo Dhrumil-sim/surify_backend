@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import fs from 'fs';
-import { ISong } from '../interfaces/song.types.interfaces';
+import { ISong } from '@songModule';
 export class SongFileHash {
   static fileHash = (
     filePath: ISong['filePath']

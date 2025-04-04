@@ -1,9 +1,8 @@
-import { AlbumService } from './services/album.service.js';
-import { ApiError } from '../../utils/ApiError.js';
+import { AlbumService } from '@albumModule';
+import { ApiError, asyncHandler, ApiResponse } from '@utils';
 import { StatusCodes } from 'http-status-codes';
-import { asyncHandler } from '../../utils/asyncHandler.js';
-import { AuthenticatedRequest } from '../song/controllers/song.controller.js';
-import { ApiResponse } from '../../utils/ApiResponse.js';
+
+import { AuthenticatedRequest } from '@songModule';
 import { Response } from 'express';
 import mongoose from 'mongoose';
 

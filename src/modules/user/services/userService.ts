@@ -1,6 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
-import { User } from '@models/index.js';
-import { ApiError } from '@utils/index.js';
+import { User } from '@models';
+import { ApiError } from '@utils';
 
 class UserService {
   static async createUser(

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
-import { Song } from '../../../models/song.model.js';
-import { ISong } from '../interfaces/song.types.interfaces.js';
-import { ApiError } from '../../../utils/ApiError.js';
+import { Song } from '@models';
+import { ISong } from '@songModule';
+import { ApiError } from '@utils';
 import { StatusCodes } from 'http-status-codes';
 
 class SongService {

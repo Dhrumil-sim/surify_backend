@@ -1,4 +1,4 @@
-import SongService from '../services/song.service';
+import { SongService } from '@songModule';
 
 export const isSongExist = (songId: string): boolean => {
   const song = SongService.getSongById(songId);

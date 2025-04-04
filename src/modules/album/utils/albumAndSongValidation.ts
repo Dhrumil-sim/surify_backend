@@ -1,13 +1,12 @@
 import Joi from 'joi';
-import { ApiError } from '../../../utils/ApiError.js';
+import { ApiError, asyncHandler } from '@utils';
 import { StatusCodes } from 'http-status-codes';
 
-import { asyncHandler } from '../../../utils/asyncHandler.js';
-
-import { AuthenticatedRequest } from '../../song/controllers/song.controller.js';
+import { AuthenticatedRequest } from '@albumModule';
 import { NextFunction, Response } from 'express';
-import { IAlbum } from '../../../models/album.model.js';
-import { ISong, Song } from '../../../models/song.model.js';
+import { IAlbum } from '@albumModule';
+import { ISong } from '@songModule';
+import { Song } from '@models';
 
 // Album validation schema
 export const albumSchema = Joi.object({

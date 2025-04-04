@@ -1,19 +1,6 @@
-import mongoose, { Schema, Document } from 'mongoose';
-
-/**
- * Interface representing an Album document in MongoDB.
- */
-export interface IAlbum extends Document {
-  id: mongoose.Types.ObjectId;
-  artist: mongoose.Types.ObjectId;
-  title: string;
-  genre: string[];
-  releaseDate: Date;
-  coverPicture: string;
-  songs: mongoose.Types.ObjectId[];
-  deletedAt?: Date | null;
-}
-
+import { IAlbum } from '@albumModule';
+import { Schema } from 'mongoose';
+import mongoose from 'mongoose';
 /**
  * Mongoose schema for the Album model.
  */

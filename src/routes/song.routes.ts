@@ -1,9 +1,7 @@
 import { Router } from 'express';
-import { validateRequest } from '../middlewares/validateRequest/validateRequest.js';
-import { songValidationSchema } from '../modules/song/validators/songValidator.util.js';
-import SongController from '../modules/song/controllers/song.controller.js';
-import { uploadSong } from '../modules/song/middlewares/songUpload.middleware.js';
-import { verifyJWT } from '../middlewares/authHandler/auth.middleware.js';
+import { validateRequest } from '@middlewares';
+import { songValidationSchema, SongController, uploadSong } from '@songModule';
+import { verifyJWT } from '@middlewares';
 const router = Router();
 
 router.post(
