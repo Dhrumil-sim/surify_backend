@@ -1,4 +1,4 @@
-import { ISong } from 'modules/song/interfaces/song.types.interfaces.js';
+import { ISong } from '@songModule';
 import mongoose from 'mongoose';
 import { Schema } from 'mongoose';
 /**
