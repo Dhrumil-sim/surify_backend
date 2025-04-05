@@ -1,7 +1,7 @@
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
-import { ApiError } from '../../../utils/ApiError.js';
+import { ApiError } from '@utils';
 import { StatusCodes } from 'http-status-codes';
 
 // Function to create directory if it doesn't exist

@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
-import { Song, ISong } from '../../../models/song.model.js';
-import { ApiError } from '../../../utils/ApiError.js';
+import { Song } from '@models';
+import { ISong } from '@songModule';
+import { ApiError } from '@utils';
 import { StatusCodes } from 'http-status-codes';
 
 class SongService {
@@ -23,6 +24,7 @@ class SongService {
     duration: number,
     coverPicture: string,
     filePath: string,
+    fileHash: string,
     album?: mongoose.Types.ObjectId
   ): Promise<ISong> {
     const newSong = await Song.create({
@@ -34,6 +36,7 @@ class SongService {
       coverPicture,
       filePath,
       album,
+      fileHash,
     });
     return newSong;
   }
@@ -105,6 +108,7 @@ class SongService {
       duration: number;
       coverPicture: string;
       filePath: string;
+      fileHash: string;
     }[]
   ): Promise<ISong[]> {
     try {
@@ -119,7 +123,9 @@ class SongService {
             song.duration,
             song.coverPicture,
             song.filePath,
+            song.fileHash,
             album
+
             // Pass the albumId to the createSong function
           )
         )

@@ -1,10 +1,8 @@
 /* eslint-disable prettier/prettier */
 import { Router } from 'express';
-import { validateRequest } from '../middlewares/validateRequest/validateRequest.js';
-import { songValidationSchema } from '../modules/song/utils/song.validator.js';
-import SongController from '../modules/song/song.controller.js';
-import { uploadSong } from '../modules/song/middlewares/songUpload.middleware.js';
-import { verifyJWT } from '../middlewares/authHandler/auth.middleware.js';
+import { validateRequest } from '@middlewares';
+import { songValidationSchema, SongController, uploadSong } from '@songModule';
+import { verifyJWT } from '@middlewares';
 const router = Router();
 
 router.post(

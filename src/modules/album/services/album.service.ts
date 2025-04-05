@@ -1,10 +1,8 @@
-import { Album, IAlbum } from '../../../models/album.model.js';
-
-import SongMetaData from '../../song/utils/songMetadata.util.js';
+import { Album } from '@models';
+import { ISong, SongMetaData, SongService } from '@songModule';
 import mongoose from 'mongoose';
-import { AlbumValidation } from '../utils/albumAndSongValidation.js';
-import SongService from '../../song/services/song.service.js';
-import { ApiError } from '../../../utils/ApiError.js';
+import { AlbumValidation, IAlbum } from '@albumModule';
+import { ApiError } from '@utils';
 import { StatusCodes } from 'http-status-codes';
 
 export class AlbumService {
@@ -105,7 +103,7 @@ export class AlbumService {
           song.duration, // duration
           song.coverPicture, // coverPicture
           song.filePath, // filePath
-          new mongoose.Types.ObjectId(newAlbum.artist) // album ID
+          '' + new mongoose.Types.ObjectId(newAlbum.artist) // album ID
         );
         return newSong._id;
       })

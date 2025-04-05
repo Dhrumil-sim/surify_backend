@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { asyncHandler } from '../../utils/asyncHandler.js';
+import { asyncHandler } from '@utils';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { User } from '../../models/user.model.js';
+import { User } from '@models';
 import mongoose from 'mongoose';
 
 // Extend Express Request to include cookies

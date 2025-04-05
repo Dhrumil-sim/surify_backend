@@ -1,12 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
-import { asyncHandler } from '../../utils/asyncHandler.js';
-import SongMetaData from './utils/songMetadata.util.js';
-import SongService from './services/song.service.js';
 
-import { ApiError } from '../../utils/ApiError.js';
+import { ApiError } from '@utils';
+import { SongService } from '@songModule';
 import { StatusCodes } from 'http-status-codes';
-import { ISong, Song } from '../../models/song.model.js';
-import { ApiResponse } from '../../utils/ApiResponse.js';
+import { Song } from '@models';
+import { ISong } from '@songModule';
+import { SongFileHash, SongMetaData } from '@songModule';
+import { asyncHandler } from '@utils';
+import { ApiResponse } from '@utils';
 export interface AuthenticatedRequest extends Request {
   cookies: { accessToken?: string; refreshToken?: string }; // Define cookies with accessToken
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -48,13 +49,25 @@ class SongController {
       if (!songFile) {
         return res.status(400).json({ message: 'No song file uploaded' });
       }
+      const fileHash = await SongFileHash.fileHash(songFile);
 
       // Call the getMetadata function with path of songFile
       const songMetadata = await SongMetaData.getMetadata(songFile);
       const {
         format: { duration },
       } = songMetadata;
-
+      const duplicate = await Song.findOne({
+        fileHash: fileHash,
+        artist: artistId,
+        duration: duration,
+      });
+      if (duplicate) {
+        throw new ApiError(
+          StatusCodes.CONFLICT,
+          'SONG_DUPLICATION',
+          'Song file is already exists with the given file content'
+        );
+      }
       try {
         const { title, genre } = req.body;
         const genreArray = JSON.parse(genre);
@@ -67,7 +80,8 @@ class SongController {
           releaseDate,
           duration!,
           coverFile!,
-          songFile
+          songFile,
+          fileHash
         );
 
         // Proceed with song creation (e.g., saving to the database)
