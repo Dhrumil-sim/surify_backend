@@ -45,6 +45,7 @@ export const albumSchema = Joi.object({
   }),
 
   songs: Joi.array()
+    .optional()
     .items(
       Joi.object({
         artist: Joi.string().hex().length(24).optional().messages({

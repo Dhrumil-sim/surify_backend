@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Router } from 'express';
 import { validateRequest } from '../middlewares/validateRequest/validateRequest.js';
 import { songValidationSchema } from '../modules/song/utils/song.validator.js';

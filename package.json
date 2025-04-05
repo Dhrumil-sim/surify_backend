@@ -5,6 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "dev": "nodemon --watch src --ext ts --exec tsx src/index.ts",
     "start": "nodemon --exec node --loader ts-node/esm src/index.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -50,6 +51,7 @@
     "lint-staged": "^15.5.0",
     "nodemon": "^3.1.9",
     "prettier": "^3.5.3",
+    "tsx": "^4.19.3",
     "typescript-eslint": "^8.28.0"
   },
   "dependencies": {
