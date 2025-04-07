@@ -20,12 +20,12 @@ class AlbumController {
       const { title, genre, songs } = req.body;
 
       const albumData = {
-        title,
-        genre,
-        songs,
-        coverPicture: req.files?.coverPicture?.[0]?.path,
-        songFiles: req.files?.songFiles,
-        songCovers: req.files?.songCovers,
+        title: title,
+        genre: genre,
+        songs: songs,
+        coverPicture: req.body.coverPicture,
+        songFiles: req.body.songFiles,
+        songCovers: req.body.songCovers,
         userId,
       };
 

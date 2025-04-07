@@ -1,7 +1,11 @@
 import AlbumController from './controllers/album.controller.js';
 import type { IAlbum } from './interfaces/album.type.interface.js';
-import { uploadAlbum } from './middlewares/albumUpload.middleware.js';
+import {
+  saveFilesToDisk,
+  uploadAlbum,
+} from './middlewares/albumUpload.middleware.js';
 import { AlbumService } from './services/album.service.js';
+
 import {
   albumSchema,
   AlbumValidation,
@@ -15,4 +19,5 @@ export {
   uploadAlbum,
   albumSchema,
   AlbumController,
+  saveFilesToDisk,
 };

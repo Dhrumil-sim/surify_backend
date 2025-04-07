@@ -38,11 +38,6 @@ export const albumSchema = Joi.object({
       'string.invalid': `"genre" must be a valid JSON array`,
     }),
 
-  coverPicture: Joi.string().required().messages({
-    'string.base': `"coverPicture" should be a string`,
-    'any.required': `"coverPicture" is required`,
-  }),
-
   songs: Joi.array()
     .items(
       Joi.object({
@@ -99,21 +94,13 @@ export class AlbumValidation {
    */
   static validateRequiredFields(albumData: {
     title?: string;
-    genre?: string;
+    genre?: string[];
     songs?: string | { title: string; genre: string[] }[];
     coverPicture?: string;
-    songFiles?: Express.Multer.File[];
-    songCovers?: Express.Multer.File[];
+    songFiles?: string[];
+    songCovers?: string[];
   }) {
-    const { coverPicture, songs } = albumData;
-
-    if (!coverPicture) {
-      throw new ApiError(
-        StatusCodes.BAD_REQUEST,
-        'COVER_MISSING',
-        'Album cover picture is required'
-      );
-    }
+    const { songs } = albumData;
 
     if (!songs) {
       throw new ApiError(
@@ -144,8 +131,8 @@ export class AlbumValidation {
    */
   static validateSongFileCoverMatch(
     parsedSongs: { title: string; genre: string[] }[],
-    songFiles: Express.Multer.File[],
-    songCovers: Express.Multer.File[]
+    songFiles: string[],
+    songCovers: string[]
   ) {
     if (
       parsedSongs.length !== songFiles.length ||
