@@ -1,8 +1,9 @@
 import mongoose from 'mongoose';
 import { Song } from '@models';
-import { ISong } from '@songModule';
+import { ISong, ISongHistory } from '@songModule';
 import { ApiError } from '@utils';
 import { StatusCodes } from 'http-status-codes';
+import { SongHistory } from 'models/song.model';
 
 class SongService {
   /**
@@ -137,6 +138,9 @@ class SongService {
         'Failed to create songs: ' + error
       );
     }
+  }
+  static async getSongHistory(songId: string): Promise<ISongHistory[]> {
+    return await SongHistory.find({ songId }).sort({ updatedAt: -1 });
   }
 }
 

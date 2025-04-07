@@ -159,11 +159,23 @@ class SongController {
       try {
         // Update the song in the database
         const updatedSong = await SongService.updateSong(songId, updatedFields);
-
+        const oldData = await SongService.getSongHistory(songId);
+        const oldDataResponse = new ApiResponse(
+          StatusCodes.OK,
+          oldData,
+          'Song History'
+        );
+        const updatedSongResponse = new ApiResponse(
+          StatusCodes.OK,
+          updatedSong,
+          'Updated Song !'
+        );
+        res.status(oldDataResponse.statusCode).json(oldDataResponse);
         res.status(200).json({
           message: 'Song updated successfully',
           data: updatedSong,
         });
+        res.status(updatedSongResponse.statusCode).json(updatedSongResponse);
       } catch (error) {
         return next(error);
       }

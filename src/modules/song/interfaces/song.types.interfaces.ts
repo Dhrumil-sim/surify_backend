@@ -16,4 +16,13 @@ interface ISong extends Document {
   deletedAt?: Date | null;
 }
 
-export default ISong;
+/**
+ * Interface representing a previously version of data before update
+ */
+// Define the structure of the song history document
+interface ISongHistory extends Document {
+  songId: mongoose.Types.ObjectId;
+  previousData: object;
+  updatedAt: Date;
+}
+export { ISong, ISongHistory };
