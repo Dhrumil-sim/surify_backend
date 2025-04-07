@@ -62,6 +62,27 @@ class AlbumController {
       }
     }
   );
+
+  // get all albums:
+  static getAllAlbums = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const albums = await AlbumService.getAlbums();
+      if (!albums) {
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          'ALBUM_NOT_FOUND',
+          'Albums are not found'
+        );
+      } else {
+        const response = new ApiResponse(
+          StatusCodes.OK,
+          albums,
+          'Albums are fetched successfully'
+        );
+        res.status(response.statusCode).json(response);
+      }
+    }
+  );
 }
 
 export default AlbumController;

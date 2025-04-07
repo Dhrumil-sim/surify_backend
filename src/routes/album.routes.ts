@@ -39,4 +39,5 @@ router.post(
   AlbumController.createAlbum
 );
 router.get('/', verifyJWT, AlbumController.getArtistAlbums);
+router.get('/get/all-albums', verifyJWT, AlbumController.getAllAlbums);
 export default router;
