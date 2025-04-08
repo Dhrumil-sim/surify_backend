@@ -35,7 +35,7 @@ class SongService {
       duration,
       coverPicture,
       filePath,
-      album,
+      ...album,
       fileHash,
     });
     return newSong;
@@ -66,7 +66,7 @@ class SongService {
     }
   }
 
-  static async getSongByalbumId(albumId: string): Promise<ISong> {
+  static async getSongByAlbumId(albumId: string): Promise<ISong> {
     try {
       const objectId = new mongoose.Types.ObjectId(albumId);
       const song = await Song.findOne({ deletedAt: null, album: objectId });
