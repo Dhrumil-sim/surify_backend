@@ -91,52 +91,7 @@ export const albumUpdateValidator = async (
   next: NextFunction
 ) => {
   try {
-    const { files, body, user } = req;
-
-    // Parse fields
-    const parsedSongs =
-      typeof body.songs === 'string' ? JSON.parse(body.songs) : body.songs;
-
-    const parsedGenre =
-      typeof body.genre === 'string' ? JSON.parse(body.genre) : body.genre;
-
-    const songFileNames = files?.songFiles?.map((f) => f.originalname) || [];
-    const songCoverNames = files?.songCovers?.map((f) => f.originalname) || [];
-
-    // Only validate songFile <-> cover <-> data consistency if songs are present
-    if (parsedSongs?.length > 0) {
-      AlbumValidation.validateSongFileCoverMatch(
-        parsedSongs,
-        songFileNames,
-        songCoverNames
-      );
-
-      for (const [song] of parsedSongs.entries()) {
-        const isNewSong = !song._id; // Add only if it's a new song
-        if (isNewSong) {
-          const isDuplicate = await AlbumValidation.isSongDuplicated(
-            user._id,
-            song.title
-          );
-          if (isDuplicate) {
-            throw new ApiError(
-              StatusCodes.CONFLICT,
-              'SONG_ALREADY_EXIST',
-              `Song "${song.title}" already exists.`
-            );
-          }
-        }
-      }
-    }
-
-    // Save only uploaded files
-    const savedSongPaths = files?.songFiles
-      ? saveFilesToDisk(files.songFiles, 'songFiles')
-      : [];
-
-    const savedCoverPaths = files?.songCovers
-      ? saveFilesToDisk(files.songCovers, 'songCovers')
-      : [];
+    const { files, user } = req;
 
     const savedAlbumCover = files?.coverPicture
       ? saveFilesToDisk(files.coverPicture, 'coverPicture')[0]
@@ -145,10 +100,7 @@ export const albumUpdateValidator = async (
     // Overwrite request body
     req.body = {
       ...req.body,
-      songs: parsedSongs,
-      genre: parsedGenre,
-      songFiles: savedSongPaths,
-      songCovers: savedCoverPaths,
+
       coverPicture: savedAlbumCover,
       userId: user._id,
     };

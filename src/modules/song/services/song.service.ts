@@ -66,10 +66,10 @@ class SongService {
     }
   }
 
-  static async getSongByAlbumId(albumId: string): Promise<ISong> {
+  static async getSongByAlbumId(albumId: string): Promise<ISong[]> {
     try {
       const objectId = new mongoose.Types.ObjectId(albumId);
-      const song = await Song.findOne({ deletedAt: null, album: objectId });
+      const song = await Song.find({ deletedAt: null, album: objectId });
       if (!song) {
         throw new ApiError(StatusCodes.NOT_FOUND, 'Music not found');
       }

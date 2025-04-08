@@ -109,12 +109,35 @@ class AlbumController {
     }
   );
 
-  static updateAlbum = asyncHandler(async (req: AuthenticatedRequest) => {
-    const albumId = new mongoose.Types.ObjectId(req.params.albumId);
-    const artistId = req?.user?._id;
-    const existingAlbum = await AlbumHelperUtility.getAlbumById(albumId);
-    await AlbumHelperUtility.validArtist(artistId, existingAlbum?.artist);
-  });
+  static updateAlbum = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const albumId = new mongoose.Types.ObjectId(req.params.albumId);
+      const artistId = req?.user?._id;
+      const existingAlbum = await AlbumHelperUtility.getAlbumById(albumId);
+      await AlbumHelperUtility.validArtist(artistId, existingAlbum?.artist);
+
+      const originalAlbum = await AlbumService.getAlbumById(albumId);
+      const updatedAlbum = await AlbumService.updateAlbum(
+        albumId,
+        req.body,
+        originalAlbum
+      );
+      if (updatedAlbum) {
+        const response = new ApiResponse(
+          StatusCodes.OK,
+          updatedAlbum,
+          'Album is updated successfully !'
+        );
+        res.status(response.statusCode).json(response);
+      } else {
+        throw new ApiError(
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          'FAIL_TO_UPDATE',
+          'Album is not updated'
+        );
+      }
+    }
+  );
 }
 
 export default AlbumController;

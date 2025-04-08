@@ -75,17 +75,13 @@ export class AlbumService {
     updates: Partial<IAlbum>,
     existingAlbum: IAlbum
   ): Promise<IAlbum> {
-    const { title, genre, songs, coverPicture, songFiles, songCovers } =
-      updates;
+    const { title, genre, coverPicture } = updates;
 
     // Merge existing with new
     const updatedData: Partial<IAlbum> = {
       title: title || existingAlbum.title,
       genre: genre || existingAlbum.genre,
       coverPicture: coverPicture || existingAlbum.coverPicture,
-      songFiles: songFiles || existingAlbum.songFiles,
-      songCovers: songCovers || existingAlbum.songCovers,
-      songs: songs || existingAlbum.songs,
     };
 
     const updatedAlbum = await Album.findByIdAndUpdate(albumId, updatedData, {
