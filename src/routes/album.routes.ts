@@ -8,7 +8,8 @@ import {
   AuthenticatedRequest,
 } from '@albumModule';
 import { Response } from 'express';
-import { albumCreateValidator, asyncHandler } from '@utils';
+import { asyncHandler } from '@utils';
+import { albumUpdateValidator, albumCreateValidator } from '@albumModule';
 
 const router = Router();
 
@@ -53,8 +54,10 @@ router.put(
   asyncHandler(
     async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
       if (req.body.songs) {
-        albumCreateValidator(req, res, next);
-        next();
+        console.log(req.body);
+        console.log(req.files);
+        await albumUpdateValidator(req, res, next);
+        return;
       }
       next();
     }

@@ -5,12 +5,15 @@ import {
   uploadAlbum,
 } from './middlewares/albumUpload.middleware.js';
 import { AlbumService } from './services/album.service.js';
-
 import {
   albumSchema,
   AlbumValidation,
 } from './utils/albumAndSongValidation.js';
 import type { AuthenticatedRequest } from '@songModule';
+import {
+  albumCreateValidator,
+  albumUpdateValidator,
+} from './utils/albumValidator.util.js';
 export {
   IAlbum,
   AlbumService,
@@ -20,4 +23,6 @@ export {
   albumSchema,
   AlbumController,
   saveFilesToDisk,
+  albumCreateValidator,
+  albumUpdateValidator,
 };

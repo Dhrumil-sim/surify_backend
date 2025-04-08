@@ -1,4 +1,4 @@
-import { AlbumService, AlbumValidation } from '@albumModule';
+import { AlbumService } from '@albumModule';
 import { ApiError, asyncHandler, ApiResponse } from '@utils';
 import { StatusCodes } from 'http-status-codes';
 
@@ -86,38 +86,12 @@ class AlbumController {
     }
   );
 
-  static updateAlbum = asyncHandler(
-    async (req: AuthenticatedRequest, res: Response) => {
-      const albumId = new mongoose.Types.ObjectId(req.params.albumId);
-      const artistId = req?.user?._id;
-      // Parse fields
-      const songs: string[] = req?.body?.songs;
-      const titles = songs.map((ele) => ele?.title);
-      console.log(titles);
-      if (songs) {
-        await AlbumValidation.isSongDuplicated(
-          artistId,
-          // eslint-disable-next-line no-unsafe-optional-chaining
-          ...req.body.songs?.title
-        );
-      }
-      const album = await AlbumHelperUtility.getAlbumById(albumId);
-      await AlbumHelperUtility.validArtist(artistId, album?.artist);
-
-      const updatedAlbum = await AlbumService.updateAlbum(
-        albumId,
-        req.body,
-        album
-      );
-
-      const response = new ApiResponse(
-        StatusCodes.OK,
-        updatedAlbum,
-        'Album updated successfully'
-      );
-      res.status(response.statusCode).json(response);
-    }
-  );
+  static updateAlbum = asyncHandler(async (req: AuthenticatedRequest) => {
+    const albumId = new mongoose.Types.ObjectId(req.params.albumId);
+    const artistId = req?.user?._id;
+    const existingAlbum = await AlbumHelperUtility.getAlbumById(albumId);
+    await AlbumHelperUtility.validArtist(artistId, existingAlbum?.artist);
+  });
 }
 
 export default AlbumController;
