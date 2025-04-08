@@ -104,4 +104,9 @@ export class AlbumService {
     const albums = await Album.find({ deletedAt: null });
     return albums;
   }
+
+  static async getAlbumById(albumId: IAlbum['id']): Promise<IAlbum> {
+    const album = await Album.findOne({ _id: albumId, deletedAt: null });
+    return album;
+  }
 }

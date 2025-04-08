@@ -86,6 +86,29 @@ class AlbumController {
     }
   );
 
+  // get album by Id
+  static getAlbumById = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const albumId = new mongoose.Types.ObjectId(req.params.albumId);
+      console.log(albumId);
+      const albums = await AlbumService.getAlbumById(albumId);
+      if (!albums) {
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          'ALBUM_NOT_FOUND',
+          'Albums are not found'
+        );
+      } else {
+        const response = new ApiResponse(
+          StatusCodes.OK,
+          albums,
+          'Album is fetched successfully'
+        );
+        res.status(response.statusCode).json(response);
+      }
+    }
+  );
+
   static updateAlbum = asyncHandler(async (req: AuthenticatedRequest) => {
     const albumId = new mongoose.Types.ObjectId(req.params.albumId);
     const artistId = req?.user?._id;
