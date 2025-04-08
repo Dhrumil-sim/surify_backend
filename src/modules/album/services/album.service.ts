@@ -70,13 +70,38 @@ export class AlbumService {
     return newAlbum;
   }
 
+  static async updateAlbum(
+    albumId: mongoose.Types.ObjectId,
+    updates: Partial<IAlbum>,
+    existingAlbum: IAlbum
+  ): Promise<IAlbum> {
+    const { title, genre, songs, coverPicture, songFiles, songCovers } =
+      updates;
+
+    // Merge existing with new
+    const updatedData: Partial<IAlbum> = {
+      title: title || existingAlbum.title,
+      genre: genre || existingAlbum.genre,
+      coverPicture: coverPicture || existingAlbum.coverPicture,
+      songFiles: songFiles || existingAlbum.songFiles,
+      songCovers: songCovers || existingAlbum.songCovers,
+      songs: songs || existingAlbum.songs,
+    };
+
+    const updatedAlbum = await Album.findByIdAndUpdate(albumId, updatedData, {
+      new: true,
+    });
+
+    return updatedAlbum as IAlbum;
+  }
+
   static async getArtistAlbum(artistId: IAlbum['id']): Promise<IAlbum[]> {
     const album = await Album.find({ artist: artistId });
     return album;
   }
+
   static async getAlbums(): Promise<IAlbum[]> {
     const albums = await Album.find({ deletedAt: null });
-
     return albums;
   }
 }
