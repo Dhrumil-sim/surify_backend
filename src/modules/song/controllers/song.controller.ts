@@ -96,14 +96,34 @@ class SongController {
 
   static getAllSong = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const allSongs = await SongService.getAllSongs();
+      const { title, genre, artist, sortBy, page, limit } = req.query;
 
-      if (!allSongs) {
-        throw new ApiError(StatusCodes.NOT_FOUND, 'No music Founded');
+      const filters = {
+        title: title?.toString(),
+        genre: genre?.toString(),
+        artist: artist?.toString(),
+        sortBy: sortBy?.toString(),
+        page: page ? parseInt(page.toString()) : undefined,
+        limit: limit ? parseInt(limit.toString()) : undefined,
+      };
+
+      const allSongs = await SongService.getAllSongs(filters);
+
+      if (allSongs?.total === 0) {
+        throw new ApiError(StatusCodes.NOT_FOUND, 'No_music_Founded');
+      } else if (allSongs?.total !== 0 && allSongs.data.length === 0) {
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          'No_Data_In_Page',
+          'No data is found in the page'
+        );
       } else {
-        res.status(200).json({
+        const response = new ApiResponse(
+          StatusCodes.OK,
           allSongs,
-        });
+          'Songs are searched !'
+        );
+        res.status(response.statusCode).json(response);
       }
     }
   );

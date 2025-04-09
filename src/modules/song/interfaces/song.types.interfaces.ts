@@ -25,4 +25,15 @@ interface ISongHistory extends Document {
   previousData: object;
   updatedAt: Date;
 }
+
+// song search query
+
+export interface ISongQuery {
+  title?: string;
+  genre?: string;
+  artist?: string;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+}
 export { ISong, ISongHistory };

@@ -1,9 +1,10 @@
-import mongoose from 'mongoose';
-import { Song } from '@models';
-import { ISong, ISongHistory } from '@songModule';
+import mongoose, { FilterQuery } from 'mongoose';
+import { Song, User } from '@models';
+import { ISong, ISongHistory, ISongQuery, paginateQuery } from '@songModule';
 import { ApiError } from '@utils';
 import { StatusCodes } from 'http-status-codes';
 import { SongHistory } from 'models/song.model';
+import { normalizeGenre } from '../utils/normalizeGenre.util';
 
 class SongService {
   /**
@@ -41,17 +42,61 @@ class SongService {
     });
     return newSong;
   }
-  static async getAllSongs(): Promise<ISong[]> {
-    try {
-      // Fetch all songs and optionally populate artist information
-      const songs = await Song.find({ deletedAt: null }).populate(
-        'artist',
-        'name'
-      ); // Adjust the fields based on your requirements
-      return songs;
-    } catch {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Music Not Found');
+  static async getAllSongs(
+    filters: ISongQuery
+  ): Promise<{ data: ISong[]; total: number; page: number; limit: number }> {
+    const {
+      title,
+      genre,
+      artist,
+      sortBy = 'createdAt',
+      page = 1,
+      limit = 10,
+    } = filters;
+
+    const query: FilterQuery<ISong> = { deletedAt: null };
+
+    // Apply title filter
+    if (title) {
+      query.title = { $regex: title, $options: 'i' };
     }
+
+    // Apply genre filter
+    if (genre) {
+      const genreFilter = filters.genre?.split(',') ?? [];
+      if (genreFilter.length > 0) {
+        query.genre = { $in: genreFilter };
+      }
+    }
+
+    // Apply artist name filter
+    if (artist) {
+      const artistUsers = await User.find({
+        username: { $regex: artist, $options: 'i' },
+        role: 'artist',
+      });
+      const artistIds = artistUsers.map((u) => u._id);
+      if (artistIds.length) {
+        query.artist = { $in: artistIds };
+      } else {
+        return { data: [], page: 0, limit: 0, total: 0 }; // No matching artist, return empty result
+      }
+    }
+
+    const total = await Song.countDocuments(query);
+
+    let songQuery = Song.find(query)
+      .populate('artist', 'username')
+      .sort({ [sortBy]: -1 });
+
+    // Pagination
+    songQuery = paginateQuery(songQuery, { page, limit });
+    const songs = await songQuery.lean();
+    const normalizedSongs = songs.map((song) => ({
+      ...song,
+      genre: normalizeGenre(song.genre),
+    }));
+    return { data: normalizedSongs, total: total, page, limit };
   }
 
   static async getSongById(songId: string): Promise<ISong> {
