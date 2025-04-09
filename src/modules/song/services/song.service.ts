@@ -42,7 +42,9 @@ class SongService {
     });
     return newSong;
   }
-  static async getAllSongs(filters: ISongQuery): Promise<ISong[]> {
+  static async getAllSongs(
+    filters: ISongQuery
+  ): Promise<{ data: ISong[]; total: number; page: number; limit: number }> {
     const {
       title,
       genre,
@@ -77,24 +79,24 @@ class SongService {
       if (artistIds.length) {
         query.artist = { $in: artistIds };
       } else {
-        return []; // No matching artist, return empty result
+        return { data: [], page: 0, limit: 0, total: 0 }; // No matching artist, return empty result
       }
     }
 
-    console.log('Super Query', query);
+    const total = await Song.countDocuments(query);
+
     let songQuery = Song.find(query)
-      .populate('artist', 'username email')
+      .populate('artist', 'username')
       .sort({ [sortBy]: -1 });
 
     // Pagination
     songQuery = paginateQuery(songQuery, { page, limit });
-
     const songs = await songQuery.lean();
     const normalizedSongs = songs.map((song) => ({
       ...song,
       genre: normalizeGenre(song.genre),
     }));
-    return normalizedSongs;
+    return { data: normalizedSongs, total: total, page, limit };
   }
 
   static async getSongById(songId: string): Promise<ISong> {

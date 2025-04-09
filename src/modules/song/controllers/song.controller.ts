@@ -106,15 +106,24 @@ class SongController {
         page: page ? parseInt(page.toString()) : undefined,
         limit: limit ? parseInt(limit.toString()) : undefined,
       };
-      console.log(filters);
+
       const allSongs = await SongService.getAllSongs(filters);
 
-      if (!allSongs) {
-        throw new ApiError(StatusCodes.NOT_FOUND, 'No music Founded');
+      if (allSongs?.total === 0) {
+        throw new ApiError(StatusCodes.NOT_FOUND, 'No_music_Founded');
+      } else if (allSongs?.total !== 0 && allSongs.data.length === 0) {
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          'No_Data_In_Page',
+          'No data is found in the page'
+        );
       } else {
-        res.status(200).json({
+        const response = new ApiResponse(
+          StatusCodes.OK,
           allSongs,
-        });
+          'Songs are searched !'
+        );
+        res.status(response.statusCode).json(response);
       }
     }
   );
