@@ -1,3 +1,4 @@
+import { IPlayList } from '@playlistModule';
 import mongoose, { Schema } from 'mongoose';
 
 /**
@@ -8,12 +9,12 @@ import mongoose, { Schema } from 'mongoose';
  * @property {Date} dateCreated - Timestamp when the playlist was created.
  * @property {boolean} isShared - Whether the playlist is shared or private.
  */
-const playlistSchema = new Schema({
+const playlistSchema = new Schema<IPlayList>({
   name: { type: String, required: true },
-  description: { type: String },
+  description: { type: String, required: true },
   createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  dateCreated: { type: Date, default: Date.now },
   isShared: { type: Boolean, default: false },
+  deletedAt: { type: Date, default: null },
 });
 
 module.exports = mongoose.model('Playlist', playlistSchema);
