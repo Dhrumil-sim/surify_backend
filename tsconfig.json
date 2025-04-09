@@ -8,6 +8,7 @@
       "@songModule": ["modules/song/index.ts"],
       "@userModule": ["modules/user/index.ts"],
       "@albumModule": ["modules/album/index.ts"],
+      "@playlistModule": ["modules/playlist/index.ts"],
       "@models": ["models/index.ts"],
       "@routes": ["routes/index.ts"],
       "@middlewares": ["middlewares/index.ts"],
