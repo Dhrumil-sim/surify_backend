@@ -1,7 +1,9 @@
 import { Album, Song } from '@models';
-import { ISong, SongFileHash, SongMetaData } from '@songModule';
+import { ISong, SongFileHash, SongMetaData, SongService } from '@songModule';
 import mongoose from 'mongoose';
 import { IAlbum } from '@albumModule';
+import { ApiError } from '@utils';
+import { StatusCodes } from 'http-status-codes';
 
 export class AlbumService {
   static async createAlbum(albumData: {
@@ -104,5 +106,25 @@ export class AlbumService {
   static async getAlbumById(albumId: IAlbum['id']): Promise<IAlbum> {
     const album = await Album.findOne({ _id: albumId, deletedAt: null });
     return album;
+  }
+
+  static async deleteAlbum(albumId: IAlbum['id']): Promise<IAlbum> {
+    const album = await this.getAlbumById(albumId);
+    if (!album) {
+      throw new ApiError(
+        StatusCodes.NOT_FOUND,
+        'ALBUM_NOT_FOUND',
+        'Album not found'
+      );
+    }
+    const songs = album?.songs;
+    console.log(songs);
+    await Promise.all(
+      songs.map((songId) => SongService.deleteSong(songId.toString()))
+    );
+    const deletedAlbum = await Album.findByIdAndUpdate(albumId, {
+      deletedAt: Date.now(),
+    });
+    return deletedAlbum;
   }
 }

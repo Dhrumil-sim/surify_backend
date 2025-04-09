@@ -138,6 +138,54 @@ class AlbumController {
       }
     }
   );
+
+  static deleteAlbum = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const albumId = new mongoose.Types.ObjectId(req.params.albumId);
+
+      if (!mongoose.Types.ObjectId.isValid(albumId)) {
+        throw new ApiError(
+          StatusCodes.BAD_REQUEST,
+          'INVALID_ALBUM_ID',
+          'The provided album ID is not valid.',
+          [
+            {
+              field: 'albumId',
+              message: 'The albumId in the request parameter is invalid.',
+            },
+          ]
+        );
+      }
+      if (!albumId) {
+        throw new ApiError(
+          StatusCodes.BAD_REQUEST,
+          'ALBUM_ID_NOT_FOUND',
+          'Album id not found',
+          [
+            {
+              field: 'album id',
+              message: 'albumId in request parameter is not there',
+            },
+          ]
+        );
+      }
+      const deletedAlbum = await AlbumService.deleteAlbum(albumId);
+      if (!deletedAlbum) {
+        throw new ApiError(
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          'ALBUM_IS_NOT_DELETED',
+          'error while deleting the record'
+        );
+      } else {
+        const response = new ApiResponse(
+          StatusCodes.OK,
+          deletedAlbum,
+          'Album delete successfully'
+        );
+        res.status(response.statusCode).json(response);
+      }
+    }
+  );
 }
 
 export default AlbumController;
