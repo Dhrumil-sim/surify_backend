@@ -1,7 +1,7 @@
 import express, { Application } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import { userRouter, albumRouter, songRouter } from '@routes';
+import { userRouter, albumRouter, songRouter, playlistRouter } from '@routes';
 import { errorHandler } from './middlewares/errorHandler/errorHandler.js';
 import morgan from 'morgan';
 class App {
@@ -29,6 +29,7 @@ class App {
     this.app.use('/api/user', userRouter);
     this.app.use('/api/song', songRouter);
     this.app.use('/api/album', albumRouter);
+    this.app.use('/api/playlist', playlistRouter);
   }
 
   private setErrorHandler(): void {
