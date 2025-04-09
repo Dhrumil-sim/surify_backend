@@ -36,7 +36,7 @@ class SongService {
       duration,
       coverPicture,
       filePath,
-      album,
+      ...album,
       fileHash,
     });
     return newSong;
@@ -58,6 +58,19 @@ class SongService {
     try {
       const objectId = new mongoose.Types.ObjectId(songId);
       const song = await Song.findById(objectId).where({ deletedAt: null });
+      if (!song) {
+        throw new ApiError(StatusCodes.NOT_FOUND, 'Music not found');
+      }
+      return song;
+    } catch (error) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Music not found' + error);
+    }
+  }
+
+  static async getSongByAlbumId(albumId: string): Promise<ISong[]> {
+    try {
+      const objectId = new mongoose.Types.ObjectId(albumId);
+      const song = await Song.find({ deletedAt: null, album: objectId });
       if (!song) {
         throw new ApiError(StatusCodes.NOT_FOUND, 'Music not found');
       }

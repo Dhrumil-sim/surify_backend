@@ -85,3 +85,28 @@ export const albumCreateValidator = async (
     next(err);
   }
 };
+export const albumUpdateValidator = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { files, user } = req;
+
+    const savedAlbumCover = files?.coverPicture
+      ? saveFilesToDisk(files.coverPicture, 'coverPicture')[0]
+      : undefined;
+
+    // Overwrite request body
+    req.body = {
+      ...req.body,
+
+      coverPicture: savedAlbumCover,
+      userId: user._id,
+    };
+
+    next();
+  } catch (err) {
+    next(err);
+  }
+};

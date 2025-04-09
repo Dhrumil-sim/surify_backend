@@ -118,6 +118,15 @@ class SongController {
     }
   );
 
+  static getSongByAlbumId = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const albumId = '' + req.params.albumId;
+      const song = await SongService.getSongByAlbumId(albumId);
+      console.log(song);
+      res.status(200).json({ song });
+    }
+  );
+
   static updateSong = asyncHandler(
     async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
       const { role, _id: artistId } = req.user;
