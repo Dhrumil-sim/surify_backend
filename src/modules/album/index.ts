@@ -14,6 +14,7 @@ import {
   albumCreateValidator,
   albumUpdateValidator,
 } from './utils/albumValidator.util.js';
+import { AlbumFieldParser } from './utils/albumFieldParser.util.js';
 export {
   IAlbum,
   AlbumService,
@@ -25,4 +26,5 @@ export {
   saveFilesToDisk,
   albumCreateValidator,
   albumUpdateValidator,
+  AlbumFieldParser,
 };
