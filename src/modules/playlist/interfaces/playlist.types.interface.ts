@@ -15,4 +15,20 @@ export interface IPlayListRequest extends Document {
   description?: string;
   isShared: boolean;
   deletedAt?: Date | null;
+  createdBy?: mongoose.Types.ObjectId;
+}
+export interface IPlayListRequestPayload {
+  name: string;
+  description?: string;
+  isShared: boolean;
+  deletedAt?: Date | null;
+}
+export interface AuthenticatedRequest extends Request {
+  // User payload added after authentication middleware
+  user?: {
+    _id: string;
+    email: string;
+    username: string;
+    role: 'user' | 'Artist';
+  }; // optionally use JwtPayload if you're decoding the full token
 }

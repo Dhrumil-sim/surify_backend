@@ -1,5 +1,19 @@
-import {
+import type {
   IPlayList,
   IPlayListRequest,
+  AuthenticatedRequest,
+  IPlayListRequestPayload,
 } from './interfaces/playlist.types.interface';
-export { IPlayList, IPlayListRequest };
+import { PlaylistController } from './controllers/playlist.controller';
+import { createPlaylistSchema } from './validators/createPlaylist.joi.validator';
+import { Playlist } from '@models';
+
+export {
+  IPlayList,
+  IPlayListRequest,
+  AuthenticatedRequest,
+  createPlaylistSchema,
+  PlaylistController,
+  IPlayListRequestPayload,
+  Playlist,
+};
