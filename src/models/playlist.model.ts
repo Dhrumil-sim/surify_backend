@@ -17,4 +17,4 @@ const playlistSchema = new Schema<IPlayList>({
   deletedAt: { type: Date, default: null },
 });
 
-module.exports = mongoose.model('Playlist', playlistSchema);
+export const Playlist = mongoose.model<IPlayList>('Playlist', playlistSchema);
