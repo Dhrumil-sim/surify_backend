@@ -1,21 +1,28 @@
 import { Playlist } from '@playlistModule';
+import { IPlaylistResponse } from '@playlistModule/interfaces/playlist.types.interface';
 import mongoose from 'mongoose';
 
 export class PLaylistPreValidator {
-  static async isPlaylistExistByName(
-    name: string,
-    userId?: mongoose.Types.ObjectId | string
-  ): Promise<boolean> {
+  static async isPlaylistExist(
+    name?: string,
+    userId?: mongoose.Types.ObjectId | string,
+    id?: mongoose.Types.ObjectId
+  ): Promise<IPlaylistResponse> {
     const query: Record<string, unknown> = {
-      name: name.toLowerCase(),
+      deletedAt: null,
     };
+
+    if (name) {
+      query.name = name.toLowerCase();
+    }
+
+    if (id) {
+      query._id = id;
+    }
     if (userId) {
       query.createdBy = userId;
     }
-    const playlist = await Playlist.findOne(query).lean();
-    if (playlist) {
-      return true;
-    }
-    return false;
+    const playlist = await Playlist.findOne(query);
+    return playlist;
   }
 }

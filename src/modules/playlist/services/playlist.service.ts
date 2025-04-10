@@ -6,6 +6,10 @@ import {
   IPlayListRequestPayload,
   Playlist,
 } from '@playlistModule';
+import { PLAYLIST_CODES } from '@playlistModule/constants/playlist.error.massages.constant';
+import { IPlaylistResponse } from '@playlistModule/interfaces/playlist.types.interface';
+import { ApiError } from '@utils';
+import { StatusCodes } from 'http-status-codes';
 
 export class PlaylistService {
   static async createPlaylist(
@@ -26,5 +30,35 @@ export class PlaylistService {
   static async getPlaylist(): Promise<IPlayList[]> {
     const playlists = await Playlist.find({ deletedAt: null });
     return playlists;
+  }
+
+  static async updatePlayList(
+    playlistExistById: IPlaylistResponse,
+    body: Partial<IPlayListRequestPayload>
+  ) {
+    // Check if name is being updated and is unique
+    if (
+      body.name &&
+      body.name.toLowerCase() !== playlistExistById.name.toLowerCase()
+    ) {
+      const isNameTaken = await Playlist.findOne({
+        name: body.name.toLowerCase(),
+        createdBy: playlistExistById.createdBy,
+        deletedAt: null,
+        _id: { $ne: playlistExistById._id }, // exclude self
+      });
+
+      if (isNameTaken) {
+        throw new ApiError(
+          StatusCodes.CONFLICT,
+          PLAYLIST_CODES.ALREADY_EXISTS,
+          'Playlist name already exists'
+        );
+      }
+    }
+    // Merge the new updates
+    Object.assign(playlistExistById, body);
+    // Save regardless of whether name changed or not
+    return await playlistExistById.save();
   }
 }

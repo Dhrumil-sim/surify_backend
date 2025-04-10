@@ -1,5 +1,9 @@
 import { validateRequest, verifyJWT } from '@middlewares';
-import { createPlaylistSchema, PlaylistController } from '@playlistModule';
+import {
+  createPlaylistSchema,
+  PlaylistController,
+  updatePlaylistSchema,
+} from '@playlistModule';
 import { Router } from 'express';
 
 const router = Router();
@@ -17,7 +21,12 @@ router.post(
 router.get('/', verifyJWT, PlaylistController.getPlaylist);
 
 // update playlist
-router.patch('/:id');
+router.patch(
+  '/:id',
+  verifyJWT,
+  validateRequest(updatePlaylistSchema),
+  PlaylistController.updatePlaylist
+);
 
 // delete playlist
 router.delete('/:id');

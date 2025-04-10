@@ -6,7 +6,10 @@ import type {
   GetPlaylistData,
 } from './interfaces/playlist.types.interface';
 import { PlaylistController } from './controllers/playlist.controller';
-import { createPlaylistSchema } from './validators/createPlaylist.joi.validator';
+import {
+  createPlaylistSchema,
+  updatePlaylistSchema,
+} from './validators/playlist.joi.validator';
 import { Playlist } from '@models';
 import { PlaylistService } from './services/playlist.service';
 import { PLaylistPreValidator } from './validators/createPlaylist.pre.validator';
@@ -22,4 +25,5 @@ export {
   PlaylistService,
   PLaylistPreValidator,
   GetPlaylistData,
+  updatePlaylistSchema,
 };

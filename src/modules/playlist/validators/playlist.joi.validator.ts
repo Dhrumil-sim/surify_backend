@@ -22,3 +22,9 @@ export const createPlaylistSchema = Joi.object({
     'date.base': `"deletedAt" must be a valid date`,
   }),
 });
+
+export const updatePlaylistSchema = Joi.object({
+  name: Joi.string().min(2).max(50),
+  description: Joi.string().allow('', null),
+  isShared: Joi.boolean(),
+}).min(1);
