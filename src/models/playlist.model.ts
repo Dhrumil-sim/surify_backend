@@ -9,12 +9,17 @@ import mongoose, { Schema } from 'mongoose';
  * @property {Date} dateCreated - Timestamp when the playlist was created.
  * @property {boolean} isShared - Whether the playlist is shared or private.
  */
-const playlistSchema = new Schema<IPlayList>({
-  name: { type: String, required: true },
-  description: { type: String, required: true },
-  createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  isShared: { type: Boolean, default: false },
-  deletedAt: { type: Date, default: null },
-});
+const playlistSchema = new Schema<IPlayList>(
+  {
+    name: { type: String, required: true },
+    description: { type: String, required: true },
+    createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    isShared: { type: Boolean, default: false },
+    deletedAt: { type: Date, default: null },
+  },
+  {
+    timestamps: true,
+  }
+);
 
 export const Playlist = mongoose.model<IPlayList>('Playlist', playlistSchema);
