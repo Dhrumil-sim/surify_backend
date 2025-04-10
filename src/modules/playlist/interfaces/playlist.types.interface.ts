@@ -32,3 +32,11 @@ export interface AuthenticatedRequest extends Request {
     role: 'user' | 'Artist';
   }; // optionally use JwtPayload if you're decoding the full token
 }
+export interface IPlaylistResponse extends IPlayList {
+  createdAt?: string;
+  updatedAt?: string;
+}
+export interface GetPlaylistData {
+  playlists: IPlaylistResponse[];
+  total: number;
+}

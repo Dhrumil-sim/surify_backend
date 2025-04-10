@@ -23,4 +23,8 @@ export class PlaylistService {
     });
     return newPlaylist;
   }
+  static async getPlaylist(): Promise<IPlayList[]> {
+    const playlists = await Playlist.find({ deletedAt: null });
+    return playlists;
+  }
 }

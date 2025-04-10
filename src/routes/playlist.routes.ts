@@ -14,7 +14,7 @@ router.post(
 );
 
 // get all playlist
-router.get('/');
+router.get('/', verifyJWT, PlaylistController.getPlaylist);
 
 // update playlist
 router.patch('/:id');
