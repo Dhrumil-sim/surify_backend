@@ -11,7 +11,7 @@ import mongoose, { Schema } from 'mongoose';
  */
 const playlistSchema = new Schema<IPlayList>(
   {
-    name: { type: String, required: true },
+    name: { type: String, required: true, lowercase: true },
     description: { type: String, required: true },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     isShared: { type: Boolean, default: false },
