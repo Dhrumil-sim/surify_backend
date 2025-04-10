@@ -3,6 +3,7 @@ import { Response } from 'express';
 import { AuthenticatedRequest, IPlayListRequestPayload } from '@playlistModule';
 import { StatusCodes } from 'http-status-codes';
 import { PlaylistService } from '../services/playlist.service';
+import { PLaylistPreValidator } from '../validators/createPlaylist.pre.validator';
 
 export class PlaylistController {
   static createPlaylist = asyncHandler(
@@ -16,6 +17,18 @@ export class PlaylistController {
           'Invalid Data found'
         );
       } else {
+        const isPlaylistExistByName =
+          await PLaylistPreValidator.isPlaylistExistByName(
+            requestBody['name'],
+            userId
+          );
+        if (isPlaylistExistByName) {
+          throw new ApiError(
+            StatusCodes.CONFLICT,
+            'CONFLICT_PLAYLIST',
+            `Playlist is already created with given title ${requestBody['name']} for ${req.user?.username} `
+          );
+        }
         const newPlaylist = await PlaylistService.createPlaylist(
           requestBody,
           userId
