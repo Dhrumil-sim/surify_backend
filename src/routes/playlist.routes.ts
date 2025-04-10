@@ -1,9 +1,17 @@
+import { validateRequest, verifyJWT } from '@middlewares';
+import { createPlaylistSchema, PlaylistController } from '@playlistModule';
 import { Router } from 'express';
+
 const router = Router();
 
 // create playlist
 
-router.post('/create');
+router.post(
+  '/create',
+  verifyJWT,
+  validateRequest(createPlaylistSchema),
+  PlaylistController.createPlaylist
+);
 
 // get all playlist
 router.get('/');
