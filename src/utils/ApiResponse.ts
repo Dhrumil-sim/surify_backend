@@ -6,6 +6,11 @@ class ApiResponse<T> {
   constructor(
     public statusCode: number,
     public data: T,
+    meta?: {
+      total: number;
+      page: number;
+      limit: number;
+    },
     public message: string = 'Success'
   ) {
     this.success = statusCode < 400;
