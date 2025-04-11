@@ -35,11 +35,15 @@ router.post(
   PlaylistController.addSongPlaylist
 );
 
+// remove song from playlist
+router.delete(
+  '/:id/songs/:songId',
+  verifyJWT,
+  PlaylistController.deleteSongFromThePlaylist
+);
+
 // get songs in the playlist
 router.get('/:id/songs', verifyJWT, PlaylistController.getSongsFromPlaylist);
-
-// remove song from playlist
-router.delete('/:id/songs/:songId');
 
 // get shared playlist of the current user
 router.get('/shared');

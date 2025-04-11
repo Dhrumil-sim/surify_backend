@@ -1,5 +1,5 @@
 import { IPlayList } from '@playlistModule';
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Query, Schema } from 'mongoose';
 
 /**
  * @typedef Playlist
@@ -21,5 +21,12 @@ const playlistSchema = new Schema<IPlayList>(
     timestamps: true,
   }
 );
+function excludeSoftDeleted<T>(this: Query<T, T>) {
+  this.where({ deletedAt: null });
+}
+playlistSchema.pre('find', excludeSoftDeleted);
+playlistSchema.pre('findOne', excludeSoftDeleted);
+playlistSchema.pre('findOneAndUpdate', excludeSoftDeleted);
+playlistSchema.pre('countDocuments', excludeSoftDeleted);
 
 export const Playlist = mongoose.model<IPlayList>('Playlist', playlistSchema);

@@ -3,7 +3,6 @@ import { Playlist } from '@playlistModule';
 import {
   IPlayList,
   IPlaylistResponse,
-  IPlayListSong,
 } from '@playlistModule/interfaces/playlist.types.interface';
 import { ISong } from '@songModule';
 import mongoose from 'mongoose';
@@ -34,22 +33,26 @@ export class PLaylistPreValidator {
   static async isSongExistInPlaylist(
     playlistId: IPlayList['id'],
     songId: ISong['id']
-  ): Promise<IPlayListSong> {
-    const playlistWithSong = await PlaylistSong.findOne({
-      playlistId: playlistId,
-      songId: songId,
+  ): Promise<boolean> {
+    const exists = await PlaylistSong.exists({
+      playlistId: new mongoose.Types.ObjectId(playlistId),
+      songId: new mongoose.Types.ObjectId(songId),
+      deletedAt: null,
     });
-    return playlistWithSong;
+    return !!exists;
   }
 
   static async isValidUser(
     reqUserId: IPlayList['createdBy'],
     playlistId: IPlayList['createdBy']
-  ): Promise<IPlayList> {
+  ): Promise<boolean> {
     const playlist = Playlist.findOne({
       _id: playlistId,
       createdBy: reqUserId,
     });
-    return playlist;
+    if (playlist) {
+      return true;
+    }
+    return false;
   }
 }

@@ -161,4 +161,15 @@ export class PlaylistService {
     });
     return songs;
   }
+
+  static async deleteSongFromPlaylist(
+    playlistId: IPlayListSong['playlistId'],
+    songId: IPlayListSong['songId']
+  ) {
+    const deletedSong = await PlaylistSong.findOneAndUpdate(
+      { playlistId: playlistId, songId: songId },
+      { deletedAt: Date.now() }
+    );
+    return deletedSong;
+  }
 }

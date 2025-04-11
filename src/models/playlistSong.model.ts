@@ -1,5 +1,5 @@
 import { IPlayListSong } from '@playlistModule';
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Query, Schema } from 'mongoose';
 /**
  * @typedef PlaylistSong
  * @property {mongoose.Types.ObjectId} playlistId - The playlist this song belongs to (References Playlist model).
@@ -12,6 +12,14 @@ const playlistSongSchema = new Schema<IPlayListSong>({
   addedAt: { type: Date, default: Date.now },
   deletedAt: { type: Date, default: null },
 });
+
+function excludeSoftDeleted<T>(this: Query<T, T>) {
+  this.where({ deletedAt: null });
+}
+playlistSongSchema.pre('find', excludeSoftDeleted);
+playlistSongSchema.pre('findOne', excludeSoftDeleted);
+playlistSongSchema.pre('findOneAndUpdate', excludeSoftDeleted);
+playlistSongSchema.pre('countDocuments', excludeSoftDeleted);
 
 export const PlaylistSong = mongoose.model(
   'PlaylistSong',

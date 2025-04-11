@@ -193,6 +193,18 @@ export class PlaylistController {
     async (req: AuthenticatedRequest, res: Response) => {
       const playlistId = new mongoose.Types.ObjectId(req?.params?.id);
       const userId = new mongoose.Types.ObjectId(req?.user?._id);
+      const isPlaylistExist = await PLaylistPreValidator.isPlaylistExist(
+        '',
+        userId,
+        playlistId
+      );
+      if (!isPlaylistExist) {
+        throw new ApiError(
+          StatusCodes.BAD_REQUEST,
+          PLAYLIST_CODES.DELETION_FAILED,
+          PLAYLIST_MESSAGES.GET_PLAYLIST_FAILED
+        );
+      }
       const isValidUser = await PLaylistPreValidator.isValidUser(
         userId,
         playlistId
@@ -205,13 +217,6 @@ export class PlaylistController {
         );
       }
 
-      if (!playlistId.equals(isValidUser?._id)) {
-        throw new ApiError(
-          StatusCodes.OK,
-          PLAYLIST_CODES.DELETION_FAILED,
-          PLAYLIST_MESSAGES.DELETION_FAILED
-        );
-      }
       const deletedPlaylist = await PlaylistService.deletePlaylist(playlistId);
 
       const response = new ApiResponse<IPlayList>(
@@ -251,6 +256,53 @@ export class PlaylistController {
         StatusCodes.OK,
         getSongsFromPlaylist,
         PLAYLIST_MESSAGES.GET_SONGS_SUCCESS
+      );
+      res.status(response.statusCode).json(response);
+    }
+  );
+
+  static deleteSongFromThePlaylist = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const playlistId = new mongoose.Types.ObjectId(req?.params?.id);
+      const songId = new mongoose.Types.ObjectId(req?.params?.songId);
+      const playlistExistById = await PLaylistPreValidator.isPlaylistExist(
+        '',
+        '',
+        playlistId
+      );
+
+      if (!playlistExistById) {
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          PLAYLIST_CODES.NOT_FOUND,
+          PLAYLIST_MESSAGES.NOT_FOUND
+        );
+      }
+      const songExistInPlaylist =
+        await PLaylistPreValidator.isSongExistInPlaylist(playlistId, songId);
+
+      if (!songExistInPlaylist) {
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          PLAYLIST_CODES.DELETION_FAILED,
+          PLAYLIST_MESSAGES.GET_SONGS_FAILED
+        );
+      }
+      const deletedSong = await PlaylistService.deleteSongFromPlaylist(
+        playlistId,
+        songId
+      );
+      if (!deletedSong) {
+        throw new ApiError(
+          StatusCodes.OK,
+          PLAYLIST_CODES.DELETE_PLAYLIST_SONG,
+          PLAYLIST_MESSAGES.DELETE_PLAYLIST_SONG_FAIL
+        );
+      }
+      const response = new ApiResponse<IPlayListSong>(
+        StatusCodes.OK,
+        deletedSong,
+        PLAYLIST_MESSAGES.DELETE_PLAYLIST_SONG_SUCCESS
       );
       res.status(response.statusCode).json(response);
     }
