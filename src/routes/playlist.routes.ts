@@ -26,13 +26,12 @@ router.patch(
 );
 
 // delete playlist
-router.delete('/:id');
+router.delete('/:id', verifyJWT, PlaylistController.deletePlaylist);
 
 // add songs to playlist
 router.post(
   '/:id/songs/:songId',
   verifyJWT,
-
   PlaylistController.addSongPlaylist
 );
 

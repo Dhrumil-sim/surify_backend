@@ -7,7 +7,10 @@ import {
   IPlayListRequestPayload,
   Playlist,
 } from '@playlistModule';
-import { PLAYLIST_CODES } from '@playlistModule/constants/playlist.error.massages.constant';
+import {
+  PLAYLIST_CODES,
+  PLAYLIST_MESSAGES,
+} from '@playlistModule/constants/playlist.error.massages.constant';
 import {
   GetPlaylistData,
   IPlaylistResponse,
@@ -18,6 +21,7 @@ import { getPaginationOptions } from '@playlistModule/utils/pagination.util';
 import { ISong } from '@songModule';
 import { ApiError } from '@utils';
 import { StatusCodes } from 'http-status-codes';
+import mongoose from 'mongoose';
 
 export class PlaylistService {
   static async createPlaylist(
@@ -93,5 +97,49 @@ export class PlaylistService {
       addedAt: Date.now(),
     });
     return playlistWithSong;
+  }
+
+  static async deletePlaylist(playlistId: IPlayList['id']): Promise<IPlayList> {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      // Soft delete the playlist
+      const deletedPlaylist = await Playlist.findByIdAndUpdate(
+        playlistId,
+        { deletedAt: new Date() },
+        { new: true, session, runValidators: true }
+      );
+
+      if (!deletedPlaylist) {
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          PLAYLIST_CODES.DELETION_FAILED,
+          PLAYLIST_MESSAGES.DELETION_FAILED
+        );
+      }
+
+      // Soft delete associated PlaylistSong entries
+      await PlaylistSong.updateMany(
+        { playlistId },
+        { deletedAt: new Date() },
+        { session }
+      );
+
+      // Commit the transaction
+      await session.commitTransaction();
+      return deletedPlaylist;
+    } catch (error) {
+      // Abort the transaction in case of error
+      await session.abortTransaction();
+      throw new ApiError(
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        PLAYLIST_CODES.DELETION_FAILED,
+        PLAYLIST_MESSAGES.DELETION_FAILED + '' + error
+      );
+    } finally {
+      // End the session
+      session.endSession();
+    }
   }
 }

@@ -3,6 +3,7 @@ import { Response } from 'express';
 import {
   AuthenticatedRequest,
   GetPlaylistData,
+  IPlayList,
   IPlayListRequestPayload,
   IPlayListSong,
   PaginationQuery,
@@ -185,6 +186,40 @@ export class PlaylistController {
           PLAYLIST_MESSAGES.ADD_SONG_FAILED
         );
       }
+    }
+  );
+
+  static deletePlaylist = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const playlistId = new mongoose.Types.ObjectId(req?.params?.id);
+      const userId = new mongoose.Types.ObjectId(req?.user?._id);
+      const isValidUser = await PLaylistPreValidator.isValidUser(
+        userId,
+        playlistId
+      );
+      if (!isValidUser) {
+        throw new ApiError(
+          StatusCodes.UNAUTHORIZED,
+          PLAYLIST_CODES.UNAUTHORIZED,
+          PLAYLIST_MESSAGES.UNAUTHORIZED
+        );
+      }
+
+      if (!playlistId.equals(isValidUser?._id)) {
+        throw new ApiError(
+          StatusCodes.OK,
+          PLAYLIST_CODES.DELETION_FAILED,
+          PLAYLIST_MESSAGES.DELETION_FAILED
+        );
+      }
+      const deletedPlaylist = await PlaylistService.deletePlaylist(playlistId);
+
+      const response = new ApiResponse<IPlayList>(
+        StatusCodes.OK,
+        deletedPlaylist,
+        PLAYLIST_MESSAGES.DELETE_PLAYLIST_SUCCESS
+      );
+      res.status(response.statusCode).json(response);
     }
   );
 }

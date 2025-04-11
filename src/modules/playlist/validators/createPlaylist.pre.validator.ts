@@ -41,4 +41,15 @@ export class PLaylistPreValidator {
     });
     return playlistWithSong;
   }
+
+  static async isValidUser(
+    reqUserId: IPlayList['createdBy'],
+    playlistId: IPlayList['createdBy']
+  ): Promise<IPlayList> {
+    const playlist = Playlist.findOne({
+      _id: playlistId,
+      createdBy: reqUserId,
+    });
+    return playlist;
+  }
 }

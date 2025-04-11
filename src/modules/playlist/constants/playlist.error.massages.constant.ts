@@ -10,6 +10,7 @@ export const PLAYLIST_CODES = {
   UPDATE_FAILED: 'PLAYLIST_UPDATE_FAILED',
   GET_SONGS_FAILED: 'GET_PLAYLIST_SONGS_FAILED',
   GET_SHARED_FAILED: 'GET_SHARED_PLAYLISTS_FAILED',
+  UNAUTHORIZED: 'UNAUTHORIZED_OPERATION',
 };
 export const PLAYLIST_MESSAGES = {
   NOT_FOUND: 'Playlist not found.',
@@ -20,11 +21,13 @@ export const PLAYLIST_MESSAGES = {
   ADD_SONG_FAILED: 'Failed to add song to playlist.',
   ADD_SONG_CONFLICT: 'Song is already present into playlist',
   ADD_SONG_SUCCESS: 'Song added successfully to playlist',
+  UNAUTHORIZED: 'You are not eligible to perform this operation',
   REMOVE_SONG_FAILED: 'Failed to remove song from playlist.',
   UPDATE_FAILED: 'Failed to update playlist.',
   UPDATE_SUCCESS: 'Playlist updated successfully.',
   GET_SONGS_FAILED: 'Failed to retrieve songs from playlist.',
   GET_SHARED_FAILED: 'Failed to retrieve shared playlists.',
+  DELETE_PLAYLIST_SUCCESS: 'Playlist deleted successfully',
 };
 export const SONG_CODES = {
   GET_SONGS_FAILED: 'GET_SONG_FAILED',
