@@ -20,7 +20,7 @@ import {
 import { StatusCodes } from 'http-status-codes';
 import mongoose from 'mongoose';
 import { validateRequest } from '@middlewares';
-import { SongService } from '@songModule';
+import { ISong, SongService } from '@songModule';
 import { addSongToPlaylistSchema } from '@playlistModule/validators/playlist.joi.validator';
 export class PlaylistController {
   static createPlaylist = asyncHandler(
@@ -218,6 +218,39 @@ export class PlaylistController {
         StatusCodes.OK,
         deletedPlaylist,
         PLAYLIST_MESSAGES.DELETE_PLAYLIST_SUCCESS
+      );
+      res.status(response.statusCode).json(response);
+    }
+  );
+
+  static getSongsFromPlaylist = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const playlistId = new mongoose.Types.ObjectId(req?.params?.id);
+      const playlistExistById = await PLaylistPreValidator.isPlaylistExist(
+        '',
+        '',
+        playlistId
+      );
+      if (!playlistExistById) {
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          PLAYLIST_CODES.NOT_FOUND,
+          PLAYLIST_MESSAGES.NOT_FOUND
+        );
+      }
+      const getSongsFromPlaylist =
+        await PlaylistService.getSongsFromPlaylist(playlistId);
+      if (!getSongsFromPlaylist.length) {
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          PLAYLIST_CODES.GET_SONGS_FAILED,
+          PLAYLIST_MESSAGES.GET_SONGS_FAILED
+        );
+      }
+      const response = new ApiResponse<ISong[]>(
+        StatusCodes.OK,
+        getSongsFromPlaylist,
+        PLAYLIST_MESSAGES.GET_SONGS_SUCCESS
       );
       res.status(response.statusCode).json(response);
     }

@@ -26,6 +26,7 @@ export const PLAYLIST_MESSAGES = {
   UPDATE_FAILED: 'Failed to update playlist.',
   UPDATE_SUCCESS: 'Playlist updated successfully.',
   GET_SONGS_FAILED: 'Failed to retrieve songs from playlist.',
+  GET_SONGS_SUCCESS: 'Songs fetched successfully from playlist.',
   GET_SHARED_FAILED: 'Failed to retrieve shared playlists.',
   DELETE_PLAYLIST_SUCCESS: 'Playlist deleted successfully',
 };

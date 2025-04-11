@@ -1,5 +1,5 @@
 import { validateRequest } from '@middlewares';
-import { PlaylistSong } from '@models';
+import { PlaylistSong, Song } from '@models';
 import {
   createPlaylistSchema,
   IPlayList,
@@ -141,5 +141,24 @@ export class PlaylistService {
       // End the session
       session.endSession();
     }
+  }
+
+  static async getSongsFromPlaylist(playlistId: IPlayList['id']) {
+    const getPlaylistSong = await PlaylistSong.find(
+      {
+        playlistId: playlistId,
+        deletedAt: null,
+      },
+      { songId: 1 }
+    );
+    const getSongIds = getPlaylistSong.map((ele) => {
+      return ele?.songId;
+    });
+
+    const songs = await Song.find({
+      _id: { $in: getSongIds },
+      deletedAt: null,
+    });
+    return songs;
   }
 }
