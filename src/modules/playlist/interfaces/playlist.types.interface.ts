@@ -41,3 +41,17 @@ export interface GetPlaylistData {
   playlists: IPlaylistResponse[];
   total: number;
 }
+
+export interface IPlayListSong extends Document {
+  _id: mongoose.Types.ObjectId;
+  playlistId: mongoose.Types.ObjectId;
+  songId: mongoose.Types.ObjectId;
+  deletedAt: null | Date;
+  addedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+export interface IPlayListSongRequestPayload {
+  playlistId: mongoose.Types.ObjectId;
+  songId: mongoose.Types.ObjectId;
+}

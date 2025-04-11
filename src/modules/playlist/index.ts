@@ -13,7 +13,10 @@ import {
 import { Playlist } from '@models';
 import { PlaylistService } from './services/playlist.service';
 import { PLaylistPreValidator } from './validators/createPlaylist.pre.validator';
-
+import type {
+  IPlayListSong,
+  IPlayListSongRequestPayload,
+} from './interfaces/playlist.types.interface';
 export {
   IPlayList,
   IPlayListRequest,
@@ -25,5 +28,7 @@ export {
   PlaylistService,
   PLaylistPreValidator,
   GetPlaylistData,
+  IPlayListSong,
+  IPlayListSongRequestPayload,
   updatePlaylistSchema,
 };

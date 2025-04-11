@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import mongoose from 'mongoose';
 
 export const createPlaylistSchema = Joi.object({
   name: Joi.string().min(3).max(100).required().messages({
@@ -28,3 +29,18 @@ export const updatePlaylistSchema = Joi.object({
   description: Joi.string().allow('', null),
   isShared: Joi.boolean(),
 }).min(1);
+
+const objectIdSchema = Joi.string().custom((value, helpers) => {
+  if (!mongoose.Types.ObjectId.isValid(value)) {
+    return helpers.error('any.invalid', {
+      message: `"${value}" is not a valid ObjectId`,
+    });
+  }
+  return value;
+}, 'ObjectId Validation');
+
+// Schema to validate both 'id' and 'songId' parameters
+export const addSongToPlaylistSchema = Joi.object({
+  id: objectIdSchema.required(),
+  songId: objectIdSchema.required(),
+});

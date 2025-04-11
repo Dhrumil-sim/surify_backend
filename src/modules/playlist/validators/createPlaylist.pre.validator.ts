@@ -1,5 +1,11 @@
+import { PlaylistSong } from '@models';
 import { Playlist } from '@playlistModule';
-import { IPlaylistResponse } from '@playlistModule/interfaces/playlist.types.interface';
+import {
+  IPlayList,
+  IPlaylistResponse,
+  IPlayListSong,
+} from '@playlistModule/interfaces/playlist.types.interface';
+import { ISong } from '@songModule';
 import mongoose from 'mongoose';
 
 export class PLaylistPreValidator {
@@ -24,5 +30,15 @@ export class PLaylistPreValidator {
     }
     const playlist = await Playlist.findOne(query);
     return playlist;
+  }
+  static async isSongExistInPlaylist(
+    playlistId: IPlayList['id'],
+    songId: ISong['id']
+  ): Promise<IPlayListSong> {
+    const playlistWithSong = await PlaylistSong.findOne({
+      playlistId: playlistId,
+      songId: songId,
+    });
+    return playlistWithSong;
   }
 }

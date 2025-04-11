@@ -1,9 +1,6 @@
 import { validateRequest, verifyJWT } from '@middlewares';
-import {
-  createPlaylistSchema,
-  PlaylistController,
-  updatePlaylistSchema,
-} from '@playlistModule';
+import { PlaylistController, updatePlaylistSchema } from '@playlistModule';
+import {} from '@playlistModule/validators/playlist.joi.validator';
 import { Router } from 'express';
 
 const router = Router();
@@ -13,7 +10,7 @@ const router = Router();
 router.post(
   '/create',
   verifyJWT,
-  validateRequest(createPlaylistSchema),
+
   PlaylistController.createPlaylist
 );
 
@@ -32,7 +29,12 @@ router.patch(
 router.delete('/:id');
 
 // add songs to playlist
-router.post('/:id/songs');
+router.post(
+  '/:id/songs/:songId',
+  verifyJWT,
+
+  PlaylistController.addSongPlaylist
+);
 
 // remove song from playlist
 router.delete('/:id/songs/:songId');

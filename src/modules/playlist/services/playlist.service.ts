@@ -1,4 +1,5 @@
 import { validateRequest } from '@middlewares';
+import { PlaylistSong } from '@models';
 import {
   createPlaylistSchema,
   IPlayList,
@@ -7,7 +8,11 @@ import {
   Playlist,
 } from '@playlistModule';
 import { PLAYLIST_CODES } from '@playlistModule/constants/playlist.error.massages.constant';
-import { IPlaylistResponse } from '@playlistModule/interfaces/playlist.types.interface';
+import {
+  IPlaylistResponse,
+  IPlayListSong,
+} from '@playlistModule/interfaces/playlist.types.interface';
+import { ISong } from '@songModule';
 import { ApiError } from '@utils';
 import { StatusCodes } from 'http-status-codes';
 
@@ -60,5 +65,18 @@ export class PlaylistService {
     Object.assign(playlistExistById, body);
     // Save regardless of whether name changed or not
     return await playlistExistById.save();
+  }
+
+  static async addSongInPlaylist(
+    playlistId: IPlayList['id'],
+    songId: ISong['id'] | ISong['id'][]
+  ): Promise<IPlayListSong> {
+    const playlistWithSong = await PlaylistSong.create({
+      playlistId: playlistId,
+      songId: songId,
+      deletedAt: null,
+      addedAt: Date.now(),
+    });
+    return playlistWithSong;
   }
 }

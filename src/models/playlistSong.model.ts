@@ -1,3 +1,4 @@
+import { IPlayListSong } from '@playlistModule';
 import mongoose, { Schema } from 'mongoose';
 /**
  * @typedef PlaylistSong
@@ -5,10 +6,14 @@ import mongoose, { Schema } from 'mongoose';
  * @property {mongoose.Types.ObjectId} songId - The song in the playlist (References Song model).
  * @property {Date} addedAt - Timestamp when the song was added to the playlist.
  */
-const playlistSongSchema = new Schema({
+const playlistSongSchema = new Schema<IPlayListSong>({
   playlistId: { type: Schema.Types.ObjectId, ref: 'Playlist', required: true },
   songId: { type: Schema.Types.ObjectId, ref: 'Song', required: true },
   addedAt: { type: Date, default: Date.now },
+  deletedAt: { type: Date, default: null },
 });
 
-module.exports = mongoose.model('PlaylistSong', playlistSongSchema);
+export const PlaylistSong = mongoose.model(
+  'PlaylistSong',
+  playlistSongSchema
+)<IPlayListSong>;
