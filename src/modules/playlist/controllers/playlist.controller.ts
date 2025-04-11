@@ -5,7 +5,7 @@ import {
   GetPlaylistData,
   IPlayListRequestPayload,
   IPlayListSong,
-  Playlist,
+  PaginationQuery,
   PLaylistPreValidator,
   PlaylistService,
   updatePlaylistSchema,
@@ -69,24 +69,29 @@ export class PlaylistController {
 
   static getPlaylist = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const playlists = await PlaylistService.getPlaylist();
+      const query: PaginationQuery = {
+        page: req.query.page ? parseInt(req.query.page as string, 10) : 1,
+        limit: req.query.limit ? parseInt(req.query.limit as string, 10) : 10,
+        sortBy: req.query.sortBy as string,
+        sortOrder: req.query.sortOrder as 'asc' | 'desc',
+        search: req.query.search as string,
+      };
 
-      if (playlists) {
-        const total = await Playlist.countDocuments({});
-        const response = new ApiResponse<GetPlaylistData>(
-          StatusCodes.OK,
-          { playlists, total },
-          'Playlists are fetched successfully'
-        );
+      const {
+        playlists,
+        total,
+        sort,
+        filter,
+        query: returnedQuery,
+      } = await PlaylistService.getPlaylist(query);
 
-        res.status(response.statusCode).json(response);
-      } else {
-        throw new ApiError(
-          StatusCodes.NOT_FOUND,
-          'PLAYLIST_NOT_FOUND',
-          'playlist not found'
-        );
-      }
+      const response = new ApiResponse<GetPlaylistData>(
+        StatusCodes.OK,
+        { playlists, total, sort, filter, query: returnedQuery },
+        'Playlists are fetched successfully'
+      );
+
+      res.status(response.statusCode).json(response);
     }
   );
 

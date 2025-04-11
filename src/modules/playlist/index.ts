@@ -16,6 +16,7 @@ import { PLaylistPreValidator } from './validators/createPlaylist.pre.validator'
 import type {
   IPlayListSong,
   IPlayListSongRequestPayload,
+  PaginationQuery,
 } from './interfaces/playlist.types.interface';
 export {
   IPlayList,
@@ -31,4 +32,5 @@ export {
   IPlayListSong,
   IPlayListSongRequestPayload,
   updatePlaylistSchema,
+  PaginationQuery,
 };

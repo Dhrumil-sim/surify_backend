@@ -40,6 +40,9 @@ export interface IPlaylistResponse extends IPlayList {
 export interface GetPlaylistData {
   playlists: IPlaylistResponse[];
   total: number;
+  sort: Record<string, 1 | -1>;
+  filter: Record<string, unknown>;
+  query: PaginationQuery;
 }
 
 export interface IPlayListSong extends Document {
@@ -54,4 +57,12 @@ export interface IPlayListSong extends Document {
 export interface IPlayListSongRequestPayload {
   playlistId: mongoose.Types.ObjectId;
   songId: mongoose.Types.ObjectId;
+}
+export interface PaginationQuery {
+  page?: number; // Defaults to 1
+  limit?: number; // Defaults to 10
+  sortBy?: string; // Field to sort by, e.g., 'createdAt'
+  total?: number;
+  sortOrder?: 'asc' | 'desc'; // Sort order
+  search?: string; // Search term for filtering
 }

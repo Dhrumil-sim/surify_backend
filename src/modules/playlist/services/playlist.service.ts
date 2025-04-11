@@ -9,9 +9,12 @@ import {
 } from '@playlistModule';
 import { PLAYLIST_CODES } from '@playlistModule/constants/playlist.error.massages.constant';
 import {
+  GetPlaylistData,
   IPlaylistResponse,
   IPlayListSong,
+  PaginationQuery,
 } from '@playlistModule/interfaces/playlist.types.interface';
+import { getPaginationOptions } from '@playlistModule/utils/pagination.util';
 import { ISong } from '@songModule';
 import { ApiError } from '@utils';
 import { StatusCodes } from 'http-status-codes';
@@ -32,9 +35,21 @@ export class PlaylistService {
     });
     return newPlaylist;
   }
-  static async getPlaylist(): Promise<IPlayList[]> {
-    const playlists = await Playlist.find({ deletedAt: null });
-    return playlists;
+  static async getPlaylist(query: PaginationQuery): Promise<GetPlaylistData> {
+    const { skip, limit, sort } = getPaginationOptions(query);
+    const filter: Record<string, unknown> = { deletedAt: null };
+
+    if (query.search) {
+      filter.name = { $regex: query.search, $options: 'i' };
+    }
+
+    const playlists = await Playlist.find(filter)
+      .sort(sort)
+      .skip(skip)
+      .limit(limit);
+    const total = await Playlist.countDocuments(filter);
+
+    return { playlists, total, sort, filter, query };
   }
 
   static async updatePlayList(
