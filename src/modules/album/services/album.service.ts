@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import { AlbumValidation, IAlbum } from '@albumModule';
 import { ApiError } from '@utils';
 import { StatusCodes } from 'http-status-codes';
-const a = 10;
+
 export class AlbumService {
   static async createAlbum(albumData: {
     title: string;
