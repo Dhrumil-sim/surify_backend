@@ -38,11 +38,6 @@ export const albumSchema = Joi.object({
       'string.invalid': `"genre" must be a valid JSON array`,
     }),
 
-  coverPicture: Joi.string().required().messages({
-    'string.base': `"coverPicture" should be a string`,
-    'any.required': `"coverPicture" is required`,
-  }),
-
   songs: Joi.array()
     .optional()
     .items(
@@ -87,11 +82,88 @@ export const albumSchema = Joi.object({
     )
     .min(1)
     .required()
+    .custom((value, helpers) => {
+      const seenTitles = new Set();
+      for (const song of value) {
+        if (seenTitles.has(song.title)) {
+          return helpers.error('array.duplicateTitle', {
+            title: song.title,
+          });
+        }
+        seenTitles.add(song.title);
+      }
+      return value;
+    })
     .messages({
       'array.base': `"songs" should be an array`,
       'array.min': `"songs" must contain at least one song`,
       'any.required': `"songs" is required`,
+      'array.uniqueTitle': `"songs" contains duplicate title: '{#title}'`,
     }),
+});
+
+export const albumUpdateSchema = Joi.object({
+  title: Joi.string().min(3).max(100).optional(),
+
+  genre: Joi.alternatives()
+    .try(
+      Joi.array().items(Joi.string()).min(1),
+      Joi.string().custom((value, helpers) => {
+        try {
+          const parsed = JSON.parse(value);
+          if (!Array.isArray(parsed)) throw new Error();
+          return parsed;
+        } catch {
+          return helpers.error('string.invalid');
+        }
+      })
+    )
+    .optional()
+    .messages({
+      'array.base': `"genre" should be an array`,
+      'array.min': `"genre" must contain at least one item`,
+      'string.invalid': `"genre" must be a valid JSON array`,
+    }),
+
+  songs: Joi.array().items(
+    Joi.object({
+      _id: Joi.string().hex().length(24).optional().messages({
+        'string.hex': `"songId" must be a valid ObjectId`,
+      }),
+
+      artist: Joi.string().hex().length(24).optional().messages({
+        'string.hex': `"artist" must be a valid ObjectId`,
+      }),
+
+      title: Joi.string().trim().required().messages({
+        'any.required': `"title" is required`,
+        'string.trim': `"title" should not have leading or trailing spaces`,
+      }),
+
+      album: Joi.string().hex().length(24).allow(null).optional().messages({
+        'string.hex': `"album" must be a valid ObjectId`,
+      }),
+
+      genre: Joi.alternatives()
+        .try(
+          Joi.array().items(Joi.string()).min(1),
+          Joi.string().custom((value, helpers) => {
+            try {
+              const parsed = JSON.parse(value);
+              if (!Array.isArray(parsed)) throw new Error();
+              return parsed;
+            } catch {
+              return helpers.error('string.invalid');
+            }
+          })
+        )
+        .required()
+        .messages({
+          'array.min': `"genre" must contain at least one item`,
+          'string.invalid': `"genre" must be a valid JSON array`,
+        }),
+    })
+  ),
 });
 
 export class AlbumValidation {
@@ -100,21 +172,13 @@ export class AlbumValidation {
    */
   static validateRequiredFields(albumData: {
     title?: string;
-    genre?: string;
+    genre?: string[];
     songs?: string | { title: string; genre: string[] }[];
     coverPicture?: string;
-    songFiles?: Express.Multer.File[];
-    songCovers?: Express.Multer.File[];
+    songFiles?: string[];
+    songCovers?: string[];
   }) {
-    const { coverPicture, songs } = albumData;
-
-    if (!coverPicture) {
-      throw new ApiError(
-        StatusCodes.BAD_REQUEST,
-        'COVER_MISSING',
-        'Album cover picture is required'
-      );
-    }
+    const { songs } = albumData;
 
     if (!songs) {
       throw new ApiError(
@@ -145,8 +209,8 @@ export class AlbumValidation {
    */
   static validateSongFileCoverMatch(
     parsedSongs: { title: string; genre: string[] }[],
-    songFiles: Express.Multer.File[],
-    songCovers: Express.Multer.File[]
+    songFiles: string[],
+    songCovers: string[]
   ) {
     if (
       parsedSongs.length !== songFiles.length ||

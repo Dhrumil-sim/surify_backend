@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { Router } from 'express';
 import { validateRequest } from '@middlewares';
 import { songValidationSchema, SongController, uploadSong } from '@songModule';

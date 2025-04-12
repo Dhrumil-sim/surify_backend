@@ -96,14 +96,39 @@ class SongController {
 
   static getAllSong = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const allSongs = await SongService.getAllSongs();
+      const { title, genre, artist, sortBy, page, limit } = req.query;
 
-      if (!allSongs) {
-        throw new ApiError(StatusCodes.NOT_FOUND, 'No music Founded');
+      const filters = {
+        title: title?.toString(),
+        genre: genre?.toString(),
+        artist: artist?.toString(),
+        sortBy: sortBy?.toString(),
+        page: page ? parseInt(page.toString()) : undefined,
+        limit: limit ? parseInt(limit.toString()) : undefined,
+      };
+
+      const {
+        data,
+        total,
+        page: currentPage,
+        limit: pageSize,
+      } = await SongService.getAllSongs(filters);
+
+      if (total === 0) {
+        throw new ApiError(StatusCodes.NOT_FOUND, 'No_music_Founded');
+      } else if (data.length === 0) {
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          'No_Data_In_Page',
+          'No data is found in the page'
+        );
       } else {
-        res.status(200).json({
-          allSongs,
-        });
+        const response = new ApiResponse(
+          StatusCodes.OK,
+          { songs: data, total, page: currentPage, limit: pageSize },
+          'Songs are searched!'
+        );
+        res.status(response.statusCode).json(response);
       }
     }
   );
@@ -113,6 +138,15 @@ class SongController {
       const songId = '' + req.params.songId;
 
       const song = await SongService.getSongById(songId);
+      console.log(song);
+      res.status(200).json({ song });
+    }
+  );
+
+  static getSongByAlbumId = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const albumId = '' + req.params.albumId;
+      const song = await SongService.getSongByAlbumId(albumId);
       console.log(song);
       res.status(200).json({ song });
     }
@@ -159,11 +193,23 @@ class SongController {
       try {
         // Update the song in the database
         const updatedSong = await SongService.updateSong(songId, updatedFields);
-
+        const oldData = await SongService.getSongHistory(songId);
+        const oldDataResponse = new ApiResponse(
+          StatusCodes.OK,
+          oldData,
+          'Song History'
+        );
+        const updatedSongResponse = new ApiResponse(
+          StatusCodes.OK,
+          updatedSong,
+          'Updated Song !'
+        );
+        res.status(oldDataResponse.statusCode).json(oldDataResponse);
         res.status(200).json({
           message: 'Song updated successfully',
           data: updatedSong,
         });
+        res.status(updatedSongResponse.statusCode).json(updatedSongResponse);
       } catch (error) {
         return next(error);
       }

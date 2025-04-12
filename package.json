@@ -10,7 +10,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "docs": "jsdoc -c jsdoc.json",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx,js,jsx}": [

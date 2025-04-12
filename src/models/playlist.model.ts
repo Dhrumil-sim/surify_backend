@@ -1,4 +1,5 @@
-import mongoose, { Schema } from 'mongoose';
+import { IPlayList } from '@playlistModule';
+import mongoose, { Query, Schema } from 'mongoose';
 
 /**
  * @typedef Playlist
@@ -8,12 +9,24 @@ import mongoose, { Schema } from 'mongoose';
  * @property {Date} dateCreated - Timestamp when the playlist was created.
  * @property {boolean} isShared - Whether the playlist is shared or private.
  */
-const playlistSchema = new Schema({
-  name: { type: String, required: true },
-  description: { type: String },
-  createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  dateCreated: { type: Date, default: Date.now },
-  isShared: { type: Boolean, default: false },
-});
+const playlistSchema = new Schema<IPlayList>(
+  {
+    name: { type: String, required: true, lowercase: true },
+    description: { type: String, required: true },
+    createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    isShared: { type: Boolean, default: false },
+    deletedAt: { type: Date, default: null },
+  },
+  {
+    timestamps: true,
+  }
+);
+function excludeSoftDeleted<T>(this: Query<T, T>) {
+  this.where({ deletedAt: null });
+}
+playlistSchema.pre('find', excludeSoftDeleted);
+playlistSchema.pre('findOne', excludeSoftDeleted);
+playlistSchema.pre('findOneAndUpdate', excludeSoftDeleted);
+playlistSchema.pre('countDocuments', excludeSoftDeleted);
 
-module.exports = mongoose.model('Playlist', playlistSchema);
+export const Playlist = mongoose.model<IPlayList>('Playlist', playlistSchema);

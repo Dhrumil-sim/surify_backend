@@ -1,10 +1,7 @@
 import { Router } from 'express';
-import { validateRequest } from '@middlewares';
-import { albumSchema, uploadAlbum, AlbumController } from '@albumModule';
 import { verifyJWT } from '@userModule';
-import { ApiError } from '@utils';
-import { StatusCodes } from 'http-status-codes';
-import { AuthenticatedRequest } from '@songModule';
+import { validateRequest } from '@middlewares';
+import { uploadAlbum, albumSchema, AlbumController } from '@albumModule';
 
 const router = Router();
 
@@ -48,33 +45,29 @@ router.post(
   ]),
   async (req: AuthenticatedRequest, res, next) => {
     try {
-      // After file upload validation, you can now proceed with further logic
+      req.body.songs = JSON.parse(req.body.songs); // Convert string to JSON array
+
       req.body.coverPicture = req.files.coverPicture[0].path;
 
-      // Additional validation if needed after files are uploaded
-      if (
-        !req.files.songFiles ||
-        req.files.songFiles.length !== req.body.songs.length
-      ) {
+      if (!req.body.songs) {
         return next(
-          new ApiError(
-            StatusCodes.BAD_REQUEST,
-            'Mismatch between number of songs and song files'
-          )
+          new ApiError(StatusCodes.BAD_REQUEST, 'Songs data is required')
         );
       }
 
-      // Proceed to the controller
-      next();
+      next(); // Proceed to validation & controller
     } catch (error) {
       return next(
         new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error.message)
       );
     }
   },
-  validateRequest(albumSchema), // Validate the schema after file handling
+  validateRequest(albumSchema),
   AlbumController.createAlbum
 );
-
 router.get('/', verifyJWT, AlbumController.getArtistAlbums);
+router.get('/get/allAlbums', verifyJWT, AlbumController.getAllAlbums);
+router.get('/album-by-id/:albumId', verifyJWT, AlbumController.getAlbumById);
+router.delete('/:albumId', verifyJWT, AlbumController.deleteAlbum);
+
 export default router;
