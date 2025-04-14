@@ -53,6 +53,14 @@ export class PlaylistService {
       .limit(limit);
     const total = await Playlist.countDocuments(filter);
 
+    if (!playlists.length) {
+      throw new ApiError(
+        StatusCodes.NOT_FOUND,
+        PLAYLIST_CODES.NOT_FOUND,
+        PLAYLIST_MESSAGES.NOT_FOUND
+      );
+    }
+
     return { playlists, total, sort, filter, query };
   }
 
