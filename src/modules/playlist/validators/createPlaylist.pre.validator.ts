@@ -1,8 +1,9 @@
-import { PlaylistSong } from '@models';
+import { PlaylistSong, SharedPlaylist } from '@models';
 import { Playlist } from '@playlistModule';
 import {
   IPlayList,
   IPlaylistResponse,
+  ISharedPlaylist,
 } from '@playlistModule/interfaces/playlist.types.interface';
 import { ISong } from '@songModule';
 import mongoose from 'mongoose';
@@ -56,6 +57,22 @@ export class PLaylistPreValidator {
       createdBy: reqUserId,
     });
     if (playlist) {
+      return true;
+    }
+    return false;
+  }
+
+  static async isPlaylistAlreadyShared(
+    userId: ISharedPlaylist['userId'],
+    playlistId: ISharedPlaylist['playlistId'],
+    creatorId: ISharedPlaylist['sharedBy']
+  ): Promise<boolean> {
+    const isSharedPlaylistExist = await SharedPlaylist.findOne({
+      userId: userId,
+      playlistId: playlistId,
+      sharedBy: creatorId,
+    });
+    if (isSharedPlaylistExist) {
       return true;
     }
     return false;
