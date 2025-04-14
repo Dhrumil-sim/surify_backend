@@ -50,4 +50,5 @@ export const SHARED_PLAYLIST_MESSAGES = {
   CONFLICT_USERS: "User can't add themselves to playlist",
   ADD_USER_TO_PLAYLIST_FAILED: 'Unable to add user to playlist',
   ADD_USER_TO_PLAYLIST_SUCCESS: 'Playlist is shared with user',
+  ALREADY_SHARED: 'Playlist is already shared with given user',
 };

@@ -318,6 +318,21 @@ export class PlaylistController {
       const creatorId = new mongoose.Types.ObjectId(req?.user?._id);
       const userId = new mongoose.Types.ObjectId(req?.params?.userId);
 
+      const isPlaylistAlreadyShared =
+        await PLaylistPreValidator.isPlaylistAlreadyShared(
+          userId,
+          playlistId,
+          creatorId
+        );
+
+      if (isPlaylistAlreadyShared) {
+        throw new ApiError(
+          StatusCodes.CONFLICT,
+          SHARED_PLAYLIST_CODES.ADD_USER_TO_PLAYLIST,
+          SHARED_PLAYLIST_MESSAGES.ALREADY_SHARED
+        );
+      }
+
       const isValidUser = await PLaylistPreValidator.isValidUser(
         creatorId,
         playlistId
