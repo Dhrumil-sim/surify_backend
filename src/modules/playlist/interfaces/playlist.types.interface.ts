@@ -66,3 +66,20 @@ export interface PaginationQuery {
   sortOrder?: 'asc' | 'desc'; // Sort order
   search?: string; // Search term for filtering
 }
+
+export interface ISharedPlaylist extends Document {
+  _id: mongoose.Types.ObjectId;
+  playlistId: IPlayList['id'];
+  userId: mongoose.Types.ObjectId;
+  sharedBy: IPlayList['createdBy'];
+  sharedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+  __v: number;
+}
+export interface ISharedPlaylistAddUserRequest {
+  playlistId: IPlayList['id'];
+  userId: ISharedPlaylist['userId'];
+  sharedBy: ISharedPlaylist['sharedBy'];
+}
