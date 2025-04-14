@@ -380,6 +380,16 @@ export class PlaylistController {
         );
       }
 
+      const playlistCreator = isPlaylistShared.createdBy;
+      const currentUser = creatorId;
+      console.log(playlistCreator, currentUser);
+      if (!playlistCreator.equals(currentUser)) {
+        throw new ApiError(
+          StatusCodes.UNAUTHORIZED,
+          SHARED_PLAYLIST_CODES.ADD_USER_TO_PLAYLIST,
+          SHARED_PLAYLIST_MESSAGES.UNAUTHORIZED
+        );
+      }
       const isUserExist = await User.findOne(userId);
       if (!isUserExist) {
         throw new ApiError(
