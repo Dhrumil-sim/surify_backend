@@ -47,4 +47,12 @@ router.get('/:id/songs', verifyJWT, PlaylistController.getSongsFromPlaylist);
 
 // get shared playlist of the current user
 router.get('/shared');
+
+// add user to shared playlist
+
+router.post(
+  '/shared/:playlistId/user/:userId',
+  verifyJWT,
+  PlaylistController.addUserToSharedPlaylist
+);
 export default router;

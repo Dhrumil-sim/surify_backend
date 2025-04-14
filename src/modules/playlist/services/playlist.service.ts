@@ -1,5 +1,5 @@
 import { validateRequest } from '@middlewares';
-import { PlaylistSong, Song } from '@models';
+import { PlaylistSong, SharedPlaylist, Song } from '@models';
 import {
   createPlaylistSchema,
   IPlayList,
@@ -15,6 +15,7 @@ import {
   GetPlaylistData,
   IPlaylistResponse,
   IPlayListSong,
+  ISharedPlaylist,
   PaginationQuery,
 } from '@playlistModule/interfaces/playlist.types.interface';
 import { getPaginationOptions } from '@playlistModule/utils/pagination.util';
@@ -179,5 +180,20 @@ export class PlaylistService {
       { deletedAt: Date.now() }
     );
     return deletedSong;
+  }
+
+  // shared playlist
+  static async sharePlaylistWithUser(
+    playlistId: ISharedPlaylist['playlistId'],
+    userId: ISharedPlaylist['userId'],
+    sharedBy: ISharedPlaylist['sharedBy']
+  ) {
+    const sharedPlaylist = SharedPlaylist.create({
+      playlistId: playlistId,
+      userId: userId,
+      sharedBy: sharedBy,
+      deletedAt: null,
+    });
+    return sharedPlaylist;
   }
 }

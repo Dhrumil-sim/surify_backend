@@ -40,3 +40,14 @@ export const SONG_CODES = {
 export const SONG_MESSAGES = {
   GET_SONGS_FAILED: 'FAILED to retrieve songs,',
 };
+
+export const SHARED_PLAYLIST_CODES = {
+  ADD_USER_TO_PLAYLIST: 'ADD_USER_TO_PLAYLIST',
+  ADD_USER_TO_PLAYLIST_FAILED: 'ADD_USER_TO_PLAYLIST_FAILED',
+};
+export const SHARED_PLAYLIST_MESSAGES = {
+  USER_NOT_FOUND: "User doesn't exists .",
+  CONFLICT_USERS: "User can't add themselves to playlist",
+  ADD_USER_TO_PLAYLIST_FAILED: 'Unable to add user to playlist',
+  ADD_USER_TO_PLAYLIST_SUCCESS: 'Playlist is shared with user',
+};

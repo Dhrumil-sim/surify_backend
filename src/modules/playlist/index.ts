@@ -17,6 +17,8 @@ import type {
   IPlayListSong,
   IPlayListSongRequestPayload,
   PaginationQuery,
+  ISharedPlaylist,
+  ISharedPlaylistAddUserRequest,
 } from './interfaces/playlist.types.interface';
 export {
   IPlayList,
@@ -33,4 +35,6 @@ export {
   IPlayListSongRequestPayload,
   updatePlaylistSchema,
   PaginationQuery,
+  ISharedPlaylist,
+  ISharedPlaylistAddUserRequest,
 };

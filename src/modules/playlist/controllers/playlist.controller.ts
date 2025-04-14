@@ -6,6 +6,7 @@ import {
   IPlayList,
   IPlayListRequestPayload,
   IPlayListSong,
+  ISharedPlaylist,
   PaginationQuery,
   PLaylistPreValidator,
   PlaylistService,
@@ -14,6 +15,8 @@ import {
 import {
   PLAYLIST_CODES,
   PLAYLIST_MESSAGES,
+  SHARED_PLAYLIST_CODES,
+  SHARED_PLAYLIST_MESSAGES,
   SONG_CODES,
   SONG_MESSAGES,
 } from '@playlistModule/constants/playlist.error.massages.constant';
@@ -22,6 +25,7 @@ import mongoose from 'mongoose';
 import { validateRequest } from '@middlewares';
 import { ISong, SongService } from '@songModule';
 import { addSongToPlaylistSchema } from '@playlistModule/validators/playlist.joi.validator';
+import { User } from '@models';
 export class PlaylistController {
   static createPlaylist = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
@@ -303,6 +307,89 @@ export class PlaylistController {
         StatusCodes.OK,
         deletedSong,
         PLAYLIST_MESSAGES.DELETE_PLAYLIST_SONG_SUCCESS
+      );
+      res.status(response.statusCode).json(response);
+    }
+  );
+
+  static addUserToSharedPlaylist = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const playlistId = new mongoose.Types.ObjectId(req?.params?.playlistId);
+      const creatorId = new mongoose.Types.ObjectId(req?.user?._id);
+      const userId = new mongoose.Types.ObjectId(req?.params?.userId);
+
+      const isValidUser = await PLaylistPreValidator.isValidUser(
+        creatorId,
+        playlistId
+      );
+
+      if (!isValidUser) {
+        throw new ApiError(
+          StatusCodes.UNAUTHORIZED,
+          SHARED_PLAYLIST_CODES.ADD_USER_TO_PLAYLIST,
+          PLAYLIST_MESSAGES.UNAUTHORIZED
+        );
+      }
+      const isPlaylistExist = await PLaylistPreValidator.isPlaylistExist(
+        '',
+        '',
+        playlistId
+      );
+      if (!isPlaylistExist) {
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          SHARED_PLAYLIST_CODES.ADD_USER_TO_PLAYLIST,
+          PLAYLIST_MESSAGES.NOT_FOUND
+        );
+      }
+      const creatorIdFromPlaylist = isPlaylistExist['createdBy'];
+      if (creatorIdFromPlaylist.equals(userId)) {
+        throw new ApiError(
+          StatusCodes.BAD_REQUEST,
+          SHARED_PLAYLIST_CODES.ADD_USER_TO_PLAYLIST,
+          SHARED_PLAYLIST_MESSAGES.CONFLICT_USERS
+        );
+      }
+      const isPlaylistShared = await PLaylistPreValidator.isPlaylistExist(
+        '',
+        '',
+        playlistId,
+        true
+      );
+
+      if (!isPlaylistShared) {
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          SHARED_PLAYLIST_CODES.ADD_USER_TO_PLAYLIST,
+          PLAYLIST_MESSAGES.GET_SHARED_FAILED
+        );
+      }
+
+      const isUserExist = await User.findOne(userId);
+      if (!isUserExist) {
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          SHARED_PLAYLIST_CODES.ADD_USER_TO_PLAYLIST,
+          SHARED_PLAYLIST_MESSAGES.USER_NOT_FOUND
+        );
+      }
+      const sharedPlaylist = await PlaylistService.sharePlaylistWithUser(
+        playlistId,
+        userId,
+        creatorId
+      );
+
+      if (!sharedPlaylist) {
+        throw new ApiError(
+          StatusCodes.BAD_REQUEST,
+          SHARED_PLAYLIST_CODES.ADD_USER_TO_PLAYLIST_FAILED,
+          SHARED_PLAYLIST_MESSAGES.ADD_USER_TO_PLAYLIST_FAILED
+        );
+      }
+      const response = new ApiResponse<ISharedPlaylist>(
+        StatusCodes.OK,
+        sharedPlaylist,
+        SHARED_PLAYLIST_MESSAGES.ADD_USER_TO_PLAYLIST_SUCCESS
       );
       res.status(response.statusCode).json(response);
     }

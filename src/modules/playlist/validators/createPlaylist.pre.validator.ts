@@ -11,12 +11,16 @@ export class PLaylistPreValidator {
   static async isPlaylistExist(
     name?: string,
     userId?: mongoose.Types.ObjectId | string,
-    id?: mongoose.Types.ObjectId
+    id?: mongoose.Types.ObjectId,
+    isShared?: boolean
   ): Promise<IPlaylistResponse> {
     const query: Record<string, unknown> = {
       deletedAt: null,
     };
 
+    if (isShared) {
+      query.isShared = isShared;
+    }
     if (name) {
       query.name = name.toLowerCase();
     }
@@ -27,6 +31,7 @@ export class PLaylistPreValidator {
     if (userId) {
       query.createdBy = userId;
     }
+    console.log(query);
     const playlist = await Playlist.findOne(query);
     return playlist;
   }
