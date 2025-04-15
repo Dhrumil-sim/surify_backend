@@ -29,7 +29,7 @@ import { User } from '@models';
 export class PlaylistController {
   static createPlaylist = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const requestBody = req.body as unknown as IPlayListRequestPayload;
+      const requestBody: IPlayListRequestPayload = req.body;
       const userId = req?.user?._id;
       if (!requestBody) {
         throw new ApiError(
@@ -37,37 +37,35 @@ export class PlaylistController {
           PLAYLIST_CODES.INVALID_INPUT,
           PLAYLIST_MESSAGES.INVALID_INPUT
         );
-      } else {
-        const isPlaylistExistByName =
-          await PLaylistPreValidator.isPlaylistExist(
-            requestBody['name'],
-            userId
-          );
-        if (isPlaylistExistByName) {
-          throw new ApiError(
-            StatusCodes.CONFLICT,
-            PLAYLIST_CODES.ALREADY_EXISTS,
-            PLAYLIST_MESSAGES.ALREADY_EXISTS
-          );
-        }
-        const newPlaylist = await PlaylistService.createPlaylist(
-          requestBody,
-          userId
+      }
+      const isPlaylistExistByName = await PLaylistPreValidator.isPlaylistExist(
+        requestBody['name'],
+        userId
+      );
+      if (isPlaylistExistByName) {
+        throw new ApiError(
+          StatusCodes.CONFLICT,
+          PLAYLIST_CODES.ALREADY_EXISTS,
+          PLAYLIST_MESSAGES.ALREADY_EXISTS
         );
-        if (newPlaylist) {
-          const response = new ApiResponse(
-            StatusCodes.CREATED,
-            newPlaylist,
-            'Playlist is created'
-          );
-          res.status(response.statusCode).json(response);
-        } else {
-          throw new ApiError(
-            StatusCodes.INTERNAL_SERVER_ERROR,
-            'PLAYLIST_IS_NOT_CREATED',
-            'there might be some issue while creating playlist'
-          );
-        }
+      }
+      const newPlaylist = await PlaylistService.createPlaylist(
+        requestBody,
+        userId
+      );
+      if (newPlaylist) {
+        const response = new ApiResponse(
+          StatusCodes.CREATED,
+          newPlaylist,
+          'Playlist is created'
+        );
+        res.status(response.statusCode).json(response);
+      } else {
+        throw new ApiError(
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          'PLAYLIST_IS_NOT_CREATED',
+          'there might be some issue while creating playlist'
+        );
       }
     }
   );
