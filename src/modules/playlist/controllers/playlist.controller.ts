@@ -80,9 +80,11 @@ export class PlaylistController {
       const query: PaginationQuery = {
         page: req.query.page ? parseInt(req.query.page as string, 10) : 1,
         limit: req.query.limit ? parseInt(req.query.limit as string, 10) : 10,
-        sortBy: String(req.query.sortBy),
-        sortOrder: sortEnum[String(req.query.sortOrder)],
-        search: String(req.query.search),
+        sortBy: req.query.sortBy ? String(req.query.sortBy) : undefined,
+        sortOrder: req.query.sortBy
+          ? sortEnum[String(req.query.sortOrder)]
+          : undefined,
+        search: req.query.search ? String(req.query.search) : undefined,
       };
 
       const {

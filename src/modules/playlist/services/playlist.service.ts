@@ -155,20 +155,33 @@ export class PlaylistService {
   static async getSongsFromPlaylist(playlistId: IPlayList['id']) {
     const getPlaylistSong = await PlaylistSong.find(
       {
-        playlistId: playlistId,
+        playlistId,
         deletedAt: null,
       },
-      { songId: 1 }
+      { songId: 1, addedAt: 1 }
     );
-    const getSongIds = getPlaylistSong.map((ele) => {
-      return ele?.songId;
+
+    const songIdToAddedAtMap = new Map<string, Date>();
+    const songIds = getPlaylistSong.map((entry) => {
+      songIdToAddedAtMap.set(entry.songId.toString(), entry.addedAt);
+      return entry.songId;
     });
 
     const songs = await Song.find({
-      _id: { $in: getSongIds },
+      _id: { $in: songIds },
       deletedAt: null,
     });
-    return songs;
+
+    // Attach addedAt to each song
+    const songsWithAddedAt = songs.map((song) => {
+      const addedAt = songIdToAddedAtMap.get(song._id.toString());
+      return {
+        ...song.toObject(),
+        addedAt,
+      };
+    });
+
+    return songsWithAddedAt;
   }
 
   static async deleteSongFromPlaylist(
