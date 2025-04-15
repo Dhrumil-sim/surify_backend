@@ -196,4 +196,9 @@ export class PlaylistService {
     });
     return sharedPlaylist;
   }
+
+  static async getSharedPlaylistWithUser(userId: ISharedPlaylist['userId']) {
+    const sharedPlaylist = await SharedPlaylist.find({ userId: userId });
+    return sharedPlaylist;
+  }
 }

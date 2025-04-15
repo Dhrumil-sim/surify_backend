@@ -420,4 +420,26 @@ export class PlaylistController {
       res.status(response.statusCode).json(response);
     }
   );
+
+  static getSharedPlaylistsWithUser = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const userId = new mongoose.Types.ObjectId(req?.user?._id);
+      const sharedPlaylist =
+        await PlaylistService.getSharedPlaylistWithUser(userId);
+      if (!sharedPlaylist.length) {
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          SHARED_PLAYLIST_CODES.GET_SHARED_PLAYLIST,
+          SHARED_PLAYLIST_MESSAGES.GET_SHARED_PLAYLIST_FAILED
+        );
+      }
+      const response = new ApiResponse(
+        StatusCodes.OK,
+        sharedPlaylist,
+        SHARED_PLAYLIST_MESSAGES.GET_SHARED_PLAYLIST_SUCCESS
+      );
+
+      res.status(response.statusCode).json(response);
+    }
+  );
 }

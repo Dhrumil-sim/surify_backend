@@ -44,6 +44,7 @@ export const SONG_MESSAGES = {
 export const SHARED_PLAYLIST_CODES = {
   ADD_USER_TO_PLAYLIST: 'ADD_USER_TO_PLAYLIST',
   ADD_USER_TO_PLAYLIST_FAILED: 'ADD_USER_TO_PLAYLIST_FAILED',
+  GET_SHARED_PLAYLIST: 'GET_SHARED_PLAYLIST',
 };
 export const SHARED_PLAYLIST_MESSAGES = {
   UNAUTHORIZED: 'You are not eligible to perform this operation..',
@@ -52,4 +53,6 @@ export const SHARED_PLAYLIST_MESSAGES = {
   ADD_USER_TO_PLAYLIST_FAILED: 'Unable to add user to playlist',
   ADD_USER_TO_PLAYLIST_SUCCESS: 'Playlist is shared with user',
   ALREADY_SHARED: 'Playlist is already shared with given user',
+  GET_SHARED_PLAYLIST_SUCCESS: 'Shared playlist fetched successfully.',
+  GET_SHARED_PLAYLIST_FAILED: 'Shared playlist not found.',
 };

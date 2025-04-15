@@ -1,5 +1,4 @@
 import Joi from 'joi';
-import mongoose from 'mongoose';
 
 export const createPlaylistSchema = Joi.object({
   name: Joi.string().min(3).max(100).required().messages({
@@ -30,17 +29,36 @@ export const updatePlaylistSchema = Joi.object({
   isShared: Joi.boolean(),
 }).min(1);
 
-const objectIdSchema = Joi.string().custom((value, helpers) => {
-  if (!mongoose.Types.ObjectId.isValid(value)) {
-    return helpers.error('any.invalid', {
-      message: `"${value}" is not a valid ObjectId`,
-    });
-  }
-  return value;
-}, 'ObjectId Validation');
+// Custom ObjectId validation using Joi for URL parameters
+export const objectIdSchema = Joi.string()
+  .regex(/^[0-9a-fA-F]{24}$/) // Ensures 24-character hex string format for ObjectId
+  .required()
+  .messages({
+    'string.pattern.base': '"{#label}" must be a valid MongoDB ObjectId',
+    'any.required': '"{#label}" is required',
+  });
 
-// Schema to validate both 'id' and 'songId' parameters
+// Schema to validate 'id' and 'songId' URL parameters
 export const addSongToPlaylistSchema = Joi.object({
+  id: objectIdSchema,
+  songId: objectIdSchema,
+});
+
+// delete song from playlist
+export const deleteSongFromPlaylistSchema = Joi.object({
   id: objectIdSchema.required(),
   songId: objectIdSchema.required(),
+});
+
+export const deletePlaylistSchema = Joi.object({
+  id: objectIdSchema.required(),
+});
+
+export const getSongsFromPlaylistSchema = Joi.object({
+  id: objectIdSchema.required(),
+});
+
+export const addOrDeleteUserToSharedPlaylistSchema = Joi.object({
+  playlistId: objectIdSchema.required(),
+  userId: objectIdSchema.required(),
 });

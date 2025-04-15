@@ -20,6 +20,7 @@ import type {
   ISharedPlaylist,
   ISharedPlaylistAddUserRequest,
 } from './interfaces/playlist.types.interface';
+import { addSongToPlaylistSchemaPreField } from './validators/playlistFields.pre.validator';
 export {
   IPlayList,
   IPlayListRequest,
@@ -37,4 +38,5 @@ export {
   PaginationQuery,
   ISharedPlaylist,
   ISharedPlaylistAddUserRequest,
+  addSongToPlaylistSchemaPreField,
 };
