@@ -107,7 +107,7 @@ export class PlaylistController {
       const playlistId = new mongoose.Types.ObjectId(req?.params?.id);
       const userId = new mongoose.Types.ObjectId(req?.user?._id);
       const playlistExistById = await PLaylistPreValidator.isPlaylistExist(
-        '',
+        undefined,
         userId,
         playlistId
       );
@@ -154,8 +154,8 @@ export class PlaylistController {
       }
 
       const playlistExistById = await PLaylistPreValidator.isPlaylistExist(
-        '',
-        '',
+        undefined,
+        undefined,
         playlistId
       );
       if (!playlistExistById) {
@@ -200,7 +200,7 @@ export class PlaylistController {
       const playlistId = new mongoose.Types.ObjectId(req?.params?.id);
       const userId = new mongoose.Types.ObjectId(req?.user?._id);
       const isPlaylistExist = await PLaylistPreValidator.isPlaylistExist(
-        '',
+        undefined,
         userId,
         playlistId
       );
@@ -238,8 +238,8 @@ export class PlaylistController {
     async (req: AuthenticatedRequest, res: Response) => {
       const playlistId = new mongoose.Types.ObjectId(req?.params?.id);
       const playlistExistById = await PLaylistPreValidator.isPlaylistExist(
-        '',
-        '',
+        undefined,
+        undefined,
         playlistId
       );
       if (!playlistExistById) {
@@ -272,8 +272,8 @@ export class PlaylistController {
       const playlistId = new mongoose.Types.ObjectId(req?.params?.id);
       const songId = new mongoose.Types.ObjectId(req?.params?.songId);
       const playlistExistById = await PLaylistPreValidator.isPlaylistExist(
-        '',
-        '',
+        undefined,
+        undefined,
         playlistId
       );
 
@@ -348,8 +348,8 @@ export class PlaylistController {
         );
       }
       const isPlaylistExist = await PLaylistPreValidator.isPlaylistExist(
-        '',
-        '',
+        undefined,
+        undefined,
         playlistId
       );
       if (!isPlaylistExist) {
@@ -368,8 +368,8 @@ export class PlaylistController {
         );
       }
       const isPlaylistShared = await PLaylistPreValidator.isPlaylistExist(
-        '',
-        '',
+        undefined,
+        undefined,
         playlistId,
         true
       );
