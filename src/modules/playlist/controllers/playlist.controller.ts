@@ -72,12 +72,16 @@ export class PlaylistController {
 
   static getPlaylist = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
+      enum sortEnum {
+        asc = 'asc',
+        desc = 'desc',
+      }
       const query: PaginationQuery = {
         page: req.query.page ? parseInt(req.query.page as string, 10) : 1,
         limit: req.query.limit ? parseInt(req.query.limit as string, 10) : 10,
-        sortBy: req.query.sortBy as string,
-        sortOrder: req.query.sortOrder as 'asc' | 'desc',
-        search: req.query.search as string,
+        sortBy: String(req.query.sortBy),
+        sortOrder: sortEnum[String(req.query.sortOrder)],
+        search: String(req.query.search),
       };
 
       const {
