@@ -53,20 +53,21 @@ export class PlaylistController {
         requestBody,
         userId
       );
-      if (newPlaylist) {
-        const response = new ApiResponse(
-          StatusCodes.CREATED,
-          newPlaylist,
-          'Playlist is created'
-        );
-        res.status(response.statusCode).json(response);
-      } else {
+
+      if (!newPlaylist) {
         throw new ApiError(
           StatusCodes.INTERNAL_SERVER_ERROR,
           'PLAYLIST_IS_NOT_CREATED',
           'there might be some issue while creating playlist'
         );
       }
+
+      const response = new ApiResponse(
+        StatusCodes.CREATED,
+        newPlaylist,
+        'Playlist is created'
+      );
+      res.status(response.statusCode).json(response);
     }
   );
 
@@ -125,14 +126,13 @@ export class PlaylistController {
           playlistExistById,
           updatePlayListPayload
         );
-        if (updatedPlaylist) {
-          const response = new ApiResponse(
-            StatusCodes.OK,
-            updatedPlaylist,
-            PLAYLIST_MESSAGES.UPDATE_SUCCESS
-          );
-          res.status(response.statusCode).json(response);
-        }
+
+        const response = new ApiResponse(
+          StatusCodes.OK,
+          updatedPlaylist,
+          PLAYLIST_MESSAGES.UPDATE_SUCCESS
+        );
+        res.status(response.statusCode).json(response);
       }
     }
   );
@@ -178,20 +178,19 @@ export class PlaylistController {
         playlistId,
         songId
       );
-      if (playlistWithSong) {
-        const response = new ApiResponse<IPlayListSong>(
-          StatusCodes.CREATED,
-          playlistWithSong,
-          PLAYLIST_MESSAGES.ADD_SONG_SUCCESS
-        );
-        res.status(response.statusCode).json(response);
-      } else {
+      if (!playlistWithSong) {
         throw new ApiError(
           StatusCodes.INTERNAL_SERVER_ERROR,
           PLAYLIST_CODES.ADD_SONG_FAILED,
           PLAYLIST_MESSAGES.ADD_SONG_FAILED
         );
       }
+      const response = new ApiResponse<IPlayListSong>(
+        StatusCodes.CREATED,
+        playlistWithSong,
+        PLAYLIST_MESSAGES.ADD_SONG_SUCCESS
+      );
+      res.status(response.statusCode).json(response);
     }
   );
 
@@ -384,7 +383,7 @@ export class PlaylistController {
 
       const playlistCreator = isPlaylistShared.createdBy;
       const currentUser = creatorId;
-      console.log(playlistCreator, currentUser);
+
       if (!playlistCreator.equals(currentUser)) {
         throw new ApiError(
           StatusCodes.UNAUTHORIZED,
