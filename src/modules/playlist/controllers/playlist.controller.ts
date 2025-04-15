@@ -23,7 +23,7 @@ import {
 import { StatusCodes } from 'http-status-codes';
 import mongoose from 'mongoose';
 import { validateRequest } from '@middlewares';
-import { ISong, SongService } from '@songModule';
+import { SongService } from '@songModule';
 import { addSongToPlaylistSchema } from '@playlistModule/validators/playlist.joi.validator';
 import { User } from '@models';
 export class PlaylistController {
@@ -259,7 +259,7 @@ export class PlaylistController {
           PLAYLIST_MESSAGES.GET_SONGS_FAILED
         );
       }
-      const response = new ApiResponse<ISong[]>(
+      const response = new ApiResponse(
         StatusCodes.OK,
         getSongsFromPlaylist,
         PLAYLIST_MESSAGES.GET_SONGS_SUCCESS
