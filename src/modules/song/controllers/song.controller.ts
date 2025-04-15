@@ -114,9 +114,9 @@ class SongController {
         limit: pageSize,
       } = await SongService.getAllSongs(filters);
 
-      if (total === 0) {
+      if (!total) {
         throw new ApiError(StatusCodes.NOT_FOUND, 'No_music_Founded');
-      } else if (data.length === 0) {
+      } else if (!data.length) {
         throw new ApiError(
           StatusCodes.NOT_FOUND,
           'No_Data_In_Page',
