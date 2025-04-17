@@ -3,6 +3,8 @@
  * @description Utility functions for handling async operations and common tasks.
  */
 
+import { NextFunction, Request, Response } from 'express';
+
 /**
  * Handles async route handlers by wrapping them in a try-catch.
  * @function asyncHandler
@@ -11,9 +13,9 @@
  * @returns {Function} Express middleware function that handles errors.
  */
 const asyncHandler = (requestHandler: Function) => {
-    return (req: Object, res: Object, next: any) => {
-        Promise.resolve(requestHandler(req, res, next)).catch((err) => next(err));
-    };
+  return (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(requestHandler(req, res, next)).catch((err) => next(err));
+  };
 };
 
-export {asyncHandler};
+export { asyncHandler };

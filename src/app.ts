@@ -1,29 +1,44 @@
-import express from "express";
-import cors from "cors";
-import cookieParser from "cookie-parser";
-import exp from "constants";
-import userRouter from './routes/user.routes.js';
-import { errorHandler } from "./middlewares/errorHandler/errorHandler.js";
-const app = express();
+import express, { Application } from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import { userRouter, albumRouter, songRouter, playlistRouter } from '@routes';
+import { errorHandler } from './middlewares/errorHandler/errorHandler.js';
+import morgan from 'morgan';
+class App {
+  public app: Application;
 
+  constructor() {
+    this.app = express();
+    this.setMiddlewares();
+    this.setRoutes();
 
-app.use(cors({
-    origin: process.env.CORS_ORIGIN
-}));
+    this.setErrorHandler();
+  }
 
-app.use(express.json({limit:'16kb'}));
-app.use(express.static("public"));
-app.use(cookieParser());
-app.use(errorHandler);
+  private setMiddlewares(): void {
+    this.app.use(express.json({ limit: '5mb' }));
+    this.app.use(express.urlencoded({ extended: true, limit: '5mb' }));
+    this.app.use(cors({ origin: process.env['CORS_ORIGIN'] }));
+    this.app.use(express.static('public'));
+    this.app.set('view engine', 'ejs');
+    this.app.use(cookieParser());
+    this.app.use(morgan(':method :url :status :response-time ms'));
+  }
 
+  private setRoutes(): void {
+    this.app.use('/api/user', userRouter);
+    this.app.use('/api/song', songRouter);
+    this.app.use('/api/album', albumRouter);
+    this.app.use('/api/playlist', playlistRouter);
+  }
 
+  private setErrorHandler(): void {
+    this.app.use(errorHandler);
+  }
 
+  public getServer(): Application {
+    return this.app;
+  }
+}
 
-app.use("/api/user",userRouter);
-
-app.get('/', (req, res) => {
-    res.send("Hello ");
-});
-
-
-export {app};
+export default new App().getServer();
