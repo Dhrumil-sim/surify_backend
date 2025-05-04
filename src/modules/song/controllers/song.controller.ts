@@ -31,7 +31,11 @@ class SongController {
           .status(403)
           .json({ message: 'Access denied: Only artists can upload songs' });
       }
-      const existingSong = await Song.find({ title: title, artist: artistId });
+      const existingSong = await Song.find({
+        title: title,
+        artist: artistId,
+        deletedAt: null,
+      });
 
       if (existingSong.length > 0) {
         throw new ApiError(
@@ -60,6 +64,7 @@ class SongController {
         fileHash: fileHash,
         artist: artistId,
         duration: duration,
+        deletedAt: null,
       });
       if (duplicate) {
         throw new ApiError(
@@ -90,6 +95,49 @@ class SongController {
           .json({ message: 'Song created successfully', data: newSong });
       } catch (error) {
         return next(error);
+      }
+    }
+  );
+
+  static getSongsByArtistId = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const artistId = req.params.artistId;
+      console.log(artistId);
+      // Reuse query params for pagination/sorting etc.
+      const { title, genre, sortBy, page, limit } = req.query;
+
+      const filters = {
+        title: title?.toString(),
+        genre: genre?.toString(),
+        artist: artistId, // Inject artistId here
+        sortBy: sortBy?.toString(),
+        page: page ? parseInt(page.toString()) : undefined,
+        limit: limit ? parseInt(limit.toString()) : undefined,
+      };
+
+      const {
+        data,
+        total,
+        page: currentPage,
+        limit: pageSize,
+      } = await SongService.getAllSongs(filters);
+
+      console.log(data);
+      if (total === 0) {
+        throw new ApiError(StatusCodes.NOT_FOUND, 'No_music_Founded');
+      } else if (data.length === 0) {
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          'No_Data_In_Page',
+          'No data is found in the page'
+        );
+      } else {
+        const response = new ApiResponse(
+          StatusCodes.OK,
+          { songs: data, total, page: currentPage, limit: pageSize },
+          'Songs fetched by artist!'
+        );
+        res.status(response.statusCode).json(response);
       }
     }
   );

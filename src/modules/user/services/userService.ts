@@ -1,6 +1,10 @@
 import { StatusCodes } from 'http-status-codes';
 import { User } from '@models';
 import { ApiError } from '@utils';
+import {
+  USER_CODES,
+  USER_MESSAGES,
+} from '../constants/user.error.massages.constant';
 
 class UserService {
   static async createUser(
@@ -34,7 +38,11 @@ class UserService {
       $or: [{ username: emailOrUsername }, { email: emailOrUsername }],
     }).select('+password');
     if (!user) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'User not found');
+      throw new ApiError(
+        StatusCodes.NOT_FOUND,
+        USER_CODES.NOT_FOUND,
+        USER_MESSAGES.NOT_FOUND
+      );
     }
     const isPasswordValid = await user.isPasswordCorrect(password);
     if (!isPasswordValid) {

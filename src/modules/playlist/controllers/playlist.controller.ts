@@ -86,13 +86,20 @@ export class PlaylistController {
         query: returnedQuery,
       } = await PlaylistService.getPlaylist(query);
 
-      const response = new ApiResponse<GetPlaylistData>(
-        StatusCodes.OK,
-        { playlists, total, sort, filter, query: returnedQuery },
-        'Playlists are fetched successfully'
-      );
-
-      res.status(response.statusCode).json(response);
+      if (playlists.length) {
+        const response = new ApiResponse<GetPlaylistData>(
+          StatusCodes.OK,
+          { playlists, total, sort, filter, query: returnedQuery },
+          'Playlists are fetched successfully'
+        );
+        res.status(response.statusCode).json(response);
+      } else {
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          PLAYLIST_CODES.NOT_FOUND,
+          PLAYLIST_MESSAGES.NOT_FOUND
+        );
+      }
     }
   );
 

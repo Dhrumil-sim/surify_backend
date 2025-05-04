@@ -32,7 +32,6 @@ const songSchema = new Schema<ISong>(
     fileHash: {
       type: String,
       required: true,
-      unique: true,
     },
     releaseDate: {
       type: Date,

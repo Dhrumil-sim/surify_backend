@@ -5,6 +5,7 @@ class SongMetaData {
     try {
       console.log('File Path', filePath);
       const metadata = await parseFile(filePath);
+      console.log(metadata);
       return metadata; // Return the metadata to be used in the controller
     } catch {
       throw new Error('Error parsing metadata');

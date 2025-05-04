@@ -1,6 +1,6 @@
 import { validateRequest, verifyJWT } from '@middlewares';
 import { PlaylistController, updatePlaylistSchema } from '@playlistModule';
-import {} from '@playlistModule/validators/playlist.joi.validator';
+import { createPlaylistSchema } from '@playlistModule/validators/playlist.joi.validator';
 import { Router } from 'express';
 
 const router = Router();
@@ -10,7 +10,7 @@ const router = Router();
 router.post(
   '/create',
   verifyJWT,
-
+  validateRequest(createPlaylistSchema),
   PlaylistController.createPlaylist
 );
 
@@ -45,6 +45,7 @@ router.delete(
 // get songs in the playlist
 router.get('/:id/songs', verifyJWT, PlaylistController.getSongsFromPlaylist);
 
+router.post('/shared/:user-id/playlist/:playlist-id', verifyJWT);
 // get shared playlist of the current user
 router.get('/shared');
 export default router;
