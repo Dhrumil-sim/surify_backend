@@ -19,8 +19,7 @@ class App {
   private setMiddlewares(): void {
     this.app.use(express.json({ limit: '5mb' }));
     this.app.use(express.urlencoded({ extended: true, limit: '5mb' }));
-    console.log(process.env['ORIGIN']);
-    this.app.use(cors({ origin: process.env['ORIGIN'], credentials: true }));
+    this.app.use(cors({ origin: process.env['CORS_ORIGIN'] }));
     this.app.use(express.static('public'));
     this.app.set('view engine', 'ejs');
     this.app.use(cookieParser());

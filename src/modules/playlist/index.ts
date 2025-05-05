@@ -17,7 +17,10 @@ import type {
   IPlayListSong,
   IPlayListSongRequestPayload,
   PaginationQuery,
+  ISharedPlaylist,
+  ISharedPlaylistAddUserRequest,
 } from './interfaces/playlist.types.interface';
+import { addSongToPlaylistSchemaPreField } from './validators/playlistFields.pre.validator';
 export {
   IPlayList,
   IPlayListRequest,
@@ -33,4 +36,7 @@ export {
   IPlayListSongRequestPayload,
   updatePlaylistSchema,
   PaginationQuery,
+  ISharedPlaylist,
+  ISharedPlaylistAddUserRequest,
+  addSongToPlaylistSchemaPreField,
 };

@@ -1,6 +1,6 @@
 import { validateRequest, verifyJWT } from '@middlewares';
 import { PlaylistController, updatePlaylistSchema } from '@playlistModule';
-import { createPlaylistSchema } from '@playlistModule/validators/playlist.joi.validator';
+import {} from '@playlistModule/validators/playlist.joi.validator';
 import { Router } from 'express';
 
 const router = Router();
@@ -10,14 +10,14 @@ const router = Router();
 router.post(
   '/create',
   verifyJWT,
-  validateRequest(createPlaylistSchema),
+
   PlaylistController.createPlaylist
 );
 
-// get all playlist
+// Get all playlists
 router.get('/', verifyJWT, PlaylistController.getPlaylist);
 
-// update playlist
+// Update a playlist
 router.patch(
   '/:id',
   verifyJWT,
@@ -25,27 +25,42 @@ router.patch(
   PlaylistController.updatePlaylist
 );
 
-// delete playlist
-router.delete('/:id', verifyJWT, PlaylistController.deletePlaylist);
+// Delete a playlist
+router.delete(
+  '/:id',
+  verifyJWT,
+  deletePlaylistSchemaPreField,
+  validateRequest(deletePlaylistSchema),
+  PlaylistController.deletePlaylist
+);
 
-// add songs to playlist
+// Add a song to a playlist
 router.post(
   '/:id/songs/:songId',
   verifyJWT,
+  addSongToPlaylistSchemaPreField,
+  validateRequest(addSongToPlaylistSchema),
   PlaylistController.addSongPlaylist
 );
 
-// remove song from playlist
+// Remove a song from a playlist
 router.delete(
   '/:id/songs/:songId',
   verifyJWT,
+  deleteSongToPlaylistSchemaPreField,
+  validateRequest(deleteSongFromPlaylistSchema),
   PlaylistController.deleteSongFromThePlaylist
 );
 
-// get songs in the playlist
-router.get('/:id/songs', verifyJWT, PlaylistController.getSongsFromPlaylist);
+// Get songs in a playlist
+router.get(
+  '/:id/songs',
+  verifyJWT,
+  getSongFromPlaylistSchemaPreField,
+  validateRequest(getSongsFromPlaylistSchema),
+  PlaylistController.getSongsFromPlaylist
+);
 
-router.post('/shared/:user-id/playlist/:playlist-id', verifyJWT);
 // get shared playlist of the current user
 router.get('/shared');
 export default router;

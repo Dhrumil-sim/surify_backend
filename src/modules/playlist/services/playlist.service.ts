@@ -1,5 +1,5 @@
 import { validateRequest } from '@middlewares';
-import { PlaylistSong, Song } from '@models';
+import { PlaylistSong, SharedPlaylist, Song } from '@models';
 import {
   createPlaylistSchema,
   IPlayList,
@@ -15,6 +15,7 @@ import {
   GetPlaylistData,
   IPlaylistResponse,
   IPlayListSong,
+  ISharedPlaylist,
   PaginationQuery,
 } from '@playlistModule/interfaces/playlist.types.interface';
 import { getPaginationOptions } from '@playlistModule/utils/pagination.util';
@@ -52,6 +53,14 @@ export class PlaylistService {
       .skip(skip)
       .limit(limit);
     const total = await Playlist.countDocuments(filter);
+
+    if (!playlists.length) {
+      throw new ApiError(
+        StatusCodes.NOT_FOUND,
+        PLAYLIST_CODES.NOT_FOUND,
+        PLAYLIST_MESSAGES.NOT_FOUND
+      );
+    }
 
     return { playlists, total, sort, filter, query };
   }
@@ -146,20 +155,33 @@ export class PlaylistService {
   static async getSongsFromPlaylist(playlistId: IPlayList['id']) {
     const getPlaylistSong = await PlaylistSong.find(
       {
-        playlistId: playlistId,
+        playlistId,
         deletedAt: null,
       },
-      { songId: 1 }
+      { songId: 1, addedAt: 1 }
     );
-    const getSongIds = getPlaylistSong.map((ele) => {
-      return ele?.songId;
+
+    const songIdToAddedAtMap = new Map<string, Date>();
+    const songIds = getPlaylistSong.map((entry) => {
+      songIdToAddedAtMap.set(entry.songId.toString(), entry.addedAt);
+      return entry.songId;
     });
 
     const songs = await Song.find({
-      _id: { $in: getSongIds },
+      _id: { $in: songIds },
       deletedAt: null,
     });
-    return songs;
+
+    // Attach addedAt to each song
+    const songsWithAddedAt = songs.map((song) => {
+      const addedAt = songIdToAddedAtMap.get(song._id.toString());
+      return {
+        ...song.toObject(),
+        addedAt,
+      };
+    });
+
+    return songsWithAddedAt;
   }
 
   static async deleteSongFromPlaylist(
@@ -171,5 +193,25 @@ export class PlaylistService {
       { deletedAt: Date.now() }
     );
     return deletedSong;
+  }
+
+  // shared playlist
+  static async sharePlaylistWithUser(
+    playlistId: ISharedPlaylist['playlistId'],
+    userId: ISharedPlaylist['userId'],
+    sharedBy: ISharedPlaylist['sharedBy']
+  ) {
+    const sharedPlaylist = SharedPlaylist.create({
+      playlistId: playlistId,
+      userId: userId,
+      sharedBy: sharedBy,
+      deletedAt: null,
+    });
+    return sharedPlaylist;
+  }
+
+  static async getSharedPlaylistWithUser(userId: ISharedPlaylist['userId']) {
+    const sharedPlaylist = await SharedPlaylist.find({ userId: userId });
+    return sharedPlaylist;
   }
 }
