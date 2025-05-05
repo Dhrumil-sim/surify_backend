@@ -1,6 +1,17 @@
 import { validateRequest, verifyJWT } from '@middlewares';
 import { PlaylistController, updatePlaylistSchema } from '@playlistModule';
-import {} from '@playlistModule/validators/playlist.joi.validator';
+import {
+  addSongToPlaylistSchema,
+  deletePlaylistSchema,
+  deleteSongFromPlaylistSchema,
+  getSongsFromPlaylistSchema,
+} from '@playlistModule/validators/playlist.joi.validator';
+import {
+  addSongToPlaylistSchemaPreField,
+  deletePlaylistSchemaPreField,
+  deleteSongToPlaylistSchemaPreField,
+  getSongFromPlaylistSchemaPreField,
+} from '@playlistModule/validators/playlistFields.pre.validator';
 import { Router } from 'express';
 
 const router = Router();
