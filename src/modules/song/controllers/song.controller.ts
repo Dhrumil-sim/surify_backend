@@ -94,6 +94,48 @@ class SongController {
     }
   );
 
+  static getSongsByArtistId = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const artistId = req.params.artistId;
+      console.log(artistId);
+      // Reuse query params for pagination/sorting etc.
+      const { title, genre, sortBy, page, limit } = req.query;
+
+      const filters = {
+        title: title?.toString(),
+        genre: genre?.toString(),
+        artist: artistId, // Inject artistId here
+        sortBy: sortBy?.toString(),
+        page: page ? parseInt(page.toString()) : undefined,
+        limit: limit ? parseInt(limit.toString()) : undefined,
+      };
+
+      const {
+        data,
+        total,
+        page: currentPage,
+        limit: pageSize,
+      } = await SongService.getAllSongs(filters);
+
+      console.log(data);
+      if (total === 0) {
+        throw new ApiError(StatusCodes.NOT_FOUND, 'No_music_Founded');
+      } else if (data.length === 0) {
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          'No_Data_In_Page',
+          'No data is found in the page'
+        );
+      } else {
+        const response = new ApiResponse(
+          StatusCodes.OK,
+          { songs: data, total, page: currentPage, limit: pageSize },
+          'Songs fetched by artist!'
+        );
+        res.status(response.statusCode).json(response);
+      }
+    }
+  );
   static getAllSong = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       const { title, genre, artist, sortBy, page, limit } = req.query;

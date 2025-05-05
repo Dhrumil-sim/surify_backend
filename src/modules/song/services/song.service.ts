@@ -70,16 +70,24 @@ class SongService {
     }
 
     // Apply artist name filter
+    // Apply artist name filter
     if (artist) {
-      const artistUsers = await User.find({
-        username: { $regex: artist, $options: 'i' },
-        role: 'artist',
-      });
-      const artistIds = artistUsers.map((u) => u._id);
-      if (artistIds.length) {
-        query.artist = { $in: artistIds };
+      const isObjectId = mongoose.Types.ObjectId.isValid(artist);
+
+      if (isObjectId) {
+        query.artist = new mongoose.Types.ObjectId(artist);
       } else {
-        return { data: [], page: 0, limit: 0, total: 0 }; // No matching artist, return empty result
+        const artistUsers = await User.find({
+          username: { $regex: artist, $options: 'i' },
+          role: 'artist',
+        });
+
+        const artistIds = artistUsers.map((u) => u._id);
+        if (artistIds.length) {
+          query.artist = { $in: artistIds };
+        } else {
+          return { data: [], page: 0, limit: 0, total: 0 };
+        }
       }
     }
 
