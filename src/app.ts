@@ -4,7 +4,8 @@ import cookieParser from 'cookie-parser';
 import { userRouter, albumRouter, songRouter, playlistRouter } from '@routes';
 import { errorHandler } from './middlewares/errorHandler/errorHandler.js';
 import morgan from 'morgan';
-
+import dotenv from 'dotenv';
+dotenv.config();
 class App {
   public app: Application;
 
@@ -19,7 +20,7 @@ class App {
   private setMiddlewares(): void {
     this.app.use(express.json({ limit: '5mb' }));
     this.app.use(express.urlencoded({ extended: true, limit: '5mb' }));
-    this.app.use(cors({ origin: process.env['CORS_ORIGIN'] }));
+    this.app.use(cors({ origin: process.env['ORIGIN'], credentials: true }));
     this.app.use(express.static('public'));
     this.app.set('view engine', 'ejs');
     this.app.use(cookieParser());
