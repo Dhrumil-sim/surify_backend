@@ -8,6 +8,7 @@ import { ISong } from '@songModule';
 import { SongFileHash, SongMetaData } from '@songModule';
 import { asyncHandler } from '@utils';
 import { ApiResponse } from '@utils';
+import { AudioStreamingUtil, StreamingRequest } from '../utils/streaming.utils';
 export interface AuthenticatedRequest extends Request {
   cookies: { accessToken?: string; refreshToken?: string }; // Define cookies with accessToken
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -284,6 +285,97 @@ class SongController {
             new ApiResponse(StatusCodes.OK, {}, 'Song Deleted Successfully')
           );
       } catch (error) {
+        return next(error);
+      }
+    }
+  );
+
+  static streamSong = asyncHandler(
+    async (req: StreamingRequest, res: Response, next: NextFunction) => {
+      try {
+        const { songId } = req.params;
+
+        // Validate song ID
+        if (!songId) {
+          throw new ApiError(StatusCodes.BAD_REQUEST, 'Song ID is required');
+        }
+
+        // Get song from database
+        const song = await SongService.getSongById(songId);
+
+        if (!song) {
+          throw new ApiError(StatusCodes.NOT_FOUND, 'Song not found');
+        }
+
+        // Check if file path exists
+        if (!song.filePath) {
+          throw new ApiError(
+            StatusCodes.NOT_FOUND,
+            'Audio file path not found'
+          );
+        }
+
+        // Validate audio format
+        if (!AudioStreamingUtil.isSupportedAudioFormat(song.filePath)) {
+          throw new ApiError(
+            StatusCodes.UNSUPPORTED_MEDIA_TYPE,
+            'Unsupported audio format'
+          );
+        }
+
+        // Log streaming activity (optional - for analytics)
+        console.log(
+          `Streaming song: ${song.title} (ID: ${songId}) for user: ${req.user?._id || 'anonymous'}`
+        );
+
+        // Stream the audio file
+        await AudioStreamingUtil.streamAudio(song.filePath, req, res);
+      } catch (error) {
+        console.error('Streaming error:', error);
+        return next(error);
+      }
+    }
+  );
+
+  /**
+   * Get streaming metadata for a song
+   * Returns file information without streaming the actual audio
+   */
+  static getStreamingMetadata = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+      try {
+        const { songId } = req.params;
+
+        if (!songId) {
+          throw new ApiError(StatusCodes.BAD_REQUEST, 'Song ID is required');
+        }
+
+        // Get song from database
+        const song = await SongService.getSongById(songId);
+
+        if (!song) {
+          throw new ApiError(StatusCodes.NOT_FOUND, 'Song not found');
+        }
+
+        // Get file metadata
+        const metadata = await AudioStreamingUtil.getStreamingMetadata(
+          song.filePath
+        );
+
+        res.status(200).json({
+          success: true,
+          data: {
+            songId: song._id,
+            title: song.title,
+            artist: song.artist,
+            duration: song.duration,
+            fileMetadata: metadata,
+            streamingUrl: `/api/songs/stream/${songId}`,
+          },
+          message: 'Streaming metadata retrieved successfully',
+        });
+      } catch (error) {
+        console.error('Metadata retrieval error:', error);
         return next(error);
       }
     }

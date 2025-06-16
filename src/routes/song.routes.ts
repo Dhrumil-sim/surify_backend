@@ -28,5 +28,6 @@ router.get('/:songId', verifyJWT, SongController.getSongById);
 router.get('/', verifyJWT, SongController.getAllSong);
 router.get('/artist/:artistId', verifyJWT, SongController.getSongsByArtistId);
 router.delete('/:songId', verifyJWT, SongController.deleteSong);
+router.get('/stream/:songId', SongController.streamSong);
 
 export default router;
