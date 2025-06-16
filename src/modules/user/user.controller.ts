@@ -146,7 +146,6 @@ class AuthController {
 
         const { accessToken, refreshToken } =
           await JWTService.generateAccessAndRefreshTokens(user.id);
-
         const options = { httpOnly: true, secure: true };
 
         return res
