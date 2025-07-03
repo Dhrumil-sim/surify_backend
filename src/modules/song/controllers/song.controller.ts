@@ -176,6 +176,7 @@ class SongController {
           { songs: data, total, page: currentPage, limit: pageSize },
           'Songs are searched!'
         );
+
         res.status(response.statusCode).json(response);
       }
     }
@@ -324,9 +325,6 @@ class SongController {
         }
 
         // Log streaming activity (optional - for analytics)
-        console.log(
-          `Streaming song: ${song.title} (ID: ${songId}) for user: ${req.user?._id || 'anonymous'}`
-        );
 
         // Stream the audio file
         await AudioStreamingUtil.streamAudio(song.filePath, req, res);
@@ -342,42 +340,37 @@ class SongController {
    * Returns file information without streaming the actual audio
    */
   static getStreamingMetadata = asyncHandler(
-    async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-      try {
-        const { songId } = req.params;
+    async (req: AuthenticatedRequest, res: Response) => {
+      const { songId } = req.params;
 
-        if (!songId) {
-          throw new ApiError(StatusCodes.BAD_REQUEST, 'Song ID is required');
-        }
-
-        // Get song from database
-        const song = await SongService.getSongById(songId);
-
-        if (!song) {
-          throw new ApiError(StatusCodes.NOT_FOUND, 'Song not found');
-        }
-
-        // Get file metadata
-        const metadata = await AudioStreamingUtil.getStreamingMetadata(
-          song.filePath
-        );
-
-        res.status(200).json({
-          success: true,
-          data: {
-            songId: song._id,
-            title: song.title,
-            artist: song.artist,
-            duration: song.duration,
-            fileMetadata: metadata,
-            streamingUrl: `/api/songs/stream/${songId}`,
-          },
-          message: 'Streaming metadata retrieved successfully',
-        });
-      } catch (error) {
-        console.error('Metadata retrieval error:', error);
-        return next(error);
+      if (!songId) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, 'Song ID is required');
       }
+
+      // Get song from database
+      const song = await SongService.getSongById(songId);
+
+      if (!song) {
+        throw new ApiError(StatusCodes.NOT_FOUND, 'Song not found');
+      }
+
+      // Get file metadata
+      const metadata = await AudioStreamingUtil.getStreamingMetadata(
+        song.filePath
+      );
+
+      res.status(200).json({
+        success: true,
+        data: {
+          songId: song._id,
+          title: song.title,
+          artist: song.artist,
+          duration: song.duration,
+          fileMetadata: metadata,
+          streamingUrl: `/api/songs/stream/${songId}`,
+        },
+        message: 'Streaming metadata retrieved successfully',
+      });
     }
   );
 }

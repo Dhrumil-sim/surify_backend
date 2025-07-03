@@ -1,7 +1,14 @@
 import { Router } from 'express';
 import { verifyJWT } from '@userModule';
 import { validateRequest } from '@middlewares';
-import { uploadAlbum, albumSchema, AlbumController } from '@albumModule';
+import {
+  uploadAlbum,
+  albumSchema,
+  AlbumController,
+  AuthenticatedRequest,
+} from '@albumModule';
+import { StatusCodes } from 'http-status-codes';
+import { ApiError } from '@utils';
 
 const router = Router();
 
