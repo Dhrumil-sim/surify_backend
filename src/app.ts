@@ -2,6 +2,7 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { userRouter, albumRouter, songRouter, playlistRouter } from '@routes';
+import listeningHistoryRouter from './routes/listening_history.routes';
 import { errorHandler } from './middlewares/errorHandler/errorHandler.js';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
@@ -32,6 +33,7 @@ class App {
     this.app.use('/api/song', songRouter);
     this.app.use('/api/album', albumRouter);
     this.app.use('/api/playlist', playlistRouter);
+    this.app.use('/api/listening-history', listeningHistoryRouter);
   }
 
   private setErrorHandler(): void {
