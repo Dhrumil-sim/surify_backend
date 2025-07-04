@@ -6,7 +6,6 @@ import {
   PaginationQuery,
   PLaylistPreValidator,
   PlaylistService,
-  updatePlaylistSchema,
 } from '@playlistModule';
 import {
   PLAYLIST_CODES,
@@ -89,10 +88,13 @@ export class PlaylistController {
       const { playlists, total } = await PlaylistService.getPlaylist(query);
 
       if (!playlists.length) {
-        throw new ApiError(
-          StatusCodes.NOT_FOUND,
-          PLAYLIST_CODES.PLAYLIST_NOT_FOUND,
-          PLAYLIST_MESSAGES.PLAYLIST_NOT_FOUND
+        return ResponseHandler.paginated(
+          res,
+          [],
+          total,
+          query.page,
+          query.limit,
+          'No playlists found'
         );
       }
 
@@ -127,7 +129,6 @@ export class PlaylistController {
       }
 
       const updatePlayListPayload: Partial<IPlayListRequestPayload> = req.body;
-      validateRequest(updatePlaylistSchema);
 
       const updatedPlaylist = await PlaylistService.updatePlayList(
         playlistExistById,

@@ -5,7 +5,6 @@ export interface IPlayList extends Document {
   name: string;
   description: string;
   createdBy: mongoose.Types.ObjectId;
-  isActive: boolean;
   isShared: boolean;
   deletedAt?: Date | null;
   __v?: number;
@@ -65,4 +64,19 @@ export interface PaginationQuery {
   total?: number;
   sortOrder?: 'asc' | 'desc'; // Sort order
   search?: string; // Search term for filtering
+}
+
+export interface ISharedPlaylist extends Document {
+  _id: mongoose.Types.ObjectId;
+  playlistId: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
+  sharedBy: mongoose.Types.ObjectId;
+  deletedAt?: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ISharedPlaylistAddUserRequest {
+  playlistId: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
 }

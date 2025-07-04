@@ -73,5 +73,5 @@ router.get(
 );
 
 // get shared playlist of the current user
-router.get('/shared');
+router.get('/shared', verifyJWT, PlaylistController.getSharedPlaylistsWithUser);
 export default router;

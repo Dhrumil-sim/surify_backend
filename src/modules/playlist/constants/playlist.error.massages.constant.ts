@@ -12,6 +12,8 @@ export const PLAYLIST_CODES = {
   PLAYLIST_UPDATE_FAILED: 'PLAYLIST_UPDATE_FAILED',
   PLAYLIST_DELETION_FAILED: 'PLAYLIST_DELETION_FAILED',
   PLAYLIST_FETCH_FAILED: 'PLAYLIST_FETCH_FAILED',
+  NOT_FOUND: 'PLAYLIST_NOT_FOUND',
+  ALREADY_EXISTS: 'PLAYLIST_ALREADY_EXISTS',
 
   // Song-related codes
   SONG_NOT_FOUND: 'SONG_NOT_FOUND',
@@ -43,6 +45,8 @@ export const PLAYLIST_MESSAGES = {
   PLAYLIST_UPDATE_FAILED: 'Failed to update playlist',
   PLAYLIST_DELETION_FAILED: 'Failed to delete the playlist',
   PLAYLIST_FETCH_FAILED: 'Failed to fetch playlist data',
+  NOT_FOUND: 'Playlist not found',
+  ALREADY_EXISTS: 'Playlist with this title already exists for user',
 
   // Song-related messages
   SONG_NOT_FOUND: 'Song not found',
