@@ -65,4 +65,22 @@ function checkAudioType(
   }
 }
 
-export { uploadSong };
+// Middleware to cleanup uploaded files if validation fails
+const cleanupUploadedFiles = (req, res, next) => {
+  const filesToDelete = [];
+  if (req.files) {
+    if (Array.isArray(req.files)) {
+      req.files.forEach((file) => filesToDelete.push(file.path));
+    } else {
+      Object.values(req.files).forEach((fileArr) => {
+        if (Array.isArray(fileArr)) {
+          fileArr.forEach((file) => filesToDelete.push(file.path));
+        }
+      });
+    }
+  }
+  req.cleanupFiles = filesToDelete;
+  next();
+};
+
+export { uploadSong, cleanupUploadedFiles };

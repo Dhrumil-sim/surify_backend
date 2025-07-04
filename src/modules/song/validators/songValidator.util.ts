@@ -48,6 +48,12 @@ const songValidationSchema = Joi.object({
       'any.required': `"genre" is required`,
     }),
 
+  language: Joi.string().trim().required().messages({
+    'string.base': `"language" should be a string`,
+    'string.trim': `"language" should not have leading or trailing spaces`,
+    'any.required': `"language" is required`,
+  }),
+
   coverPicture: Joi.string().uri().optional().messages({
     'string.base': `"cover_pic" should be a string`,
     'string.uri': `"cover_pic" should be a valid URL`,

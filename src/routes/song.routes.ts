@@ -1,6 +1,11 @@
 import { Router } from 'express';
 import { validateRequest } from '@middlewares';
-import { songValidationSchema, SongController, uploadSong } from '@songModule';
+import {
+  songValidationSchema,
+  SongController,
+  uploadSong,
+  cleanupUploadedFiles,
+} from '@songModule';
 import { verifyJWT } from '@middlewares';
 const router = Router();
 
@@ -11,6 +16,7 @@ router.post(
     { name: 'coverPicture', maxCount: 1 }, // Image field
     { name: 'filePath', maxCount: 1 }, // Audio field
   ]),
+  cleanupUploadedFiles,
   validateRequest(songValidationSchema),
   SongController.createSong
 );
@@ -21,6 +27,7 @@ router.put(
     { name: 'coverPicture', maxCount: 1 }, // Image field
     { name: 'filePath', maxCount: 1 }, // Audio field
   ]),
+  cleanupUploadedFiles,
   validateRequest(songValidationSchema),
   SongController.updateSong
 );

@@ -25,3 +25,5 @@ export {
   ISongQuery,
   paginateQuery,
 };
+
+export * from './middlewares/songUpload.middleware';
