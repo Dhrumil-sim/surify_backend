@@ -1,73 +1,136 @@
 import { Router } from 'express';
 import { verifyJWT } from '@userModule';
 import { validateRequest } from '@middlewares';
-import { uploadAlbum, albumSchema, AlbumController } from '@albumModule';
+import {
+  uploadAlbum,
+  albumSchema,
+  AlbumController,
+  AuthenticatedRequest,
+  saveFilesToDisk,
+} from '@albumModule';
+import { Album, Song } from '@models';
+import { StatusCodes } from 'http-status-codes';
+import { ApiError, asyncHandler } from '@utils';
 
 const router = Router();
 
-// Middleware to handle the non-file data validation
-const validateAlbumData = async (req, res, next) => {
-  try {
-    // Step 1: Parse and validate the songs data (non-file data)
-    req.body.songs = JSON.parse(req.body.songs); // Convert string to JSON array
-
-    // Validate the songs field after parsing
-    if (!req.body.songs) {
-      return next(
-        new ApiError(StatusCodes.BAD_REQUEST, 'Songs data is required')
-      );
+// Middleware to parse and validate form fields
+const parseAlbumFields = asyncHandler(
+  async (req: AuthenticatedRequest, res, next) => {
+    // Defensive parse for songs
+    if (!req.body.songs || req.body.songs === 'undefined') {
+      throw new ApiError(400, 'Songs data is required and must be valid JSON');
     }
-
-    // You can add more validation here if needed
-    // E.g., validate that coverPicture and songs are not empty
-    if (!req.body.coverPicture) {
-      return next(
-        new ApiError(StatusCodes.BAD_REQUEST, 'Album coverPicture is required')
-      );
+    try {
+      req.body.songs = JSON.parse(req.body.songs);
+    } catch {
+      throw new ApiError(400, 'Songs field must be valid JSON');
     }
-
-    // Proceed to the next middleware (to handle file upload)
+    // Defensive parse for genre if needed
+    if (typeof req.body.genre === 'string') {
+      try {
+        req.body.genre = JSON.parse(req.body.genre);
+      } catch {
+        req.body.genre = [req.body.genre];
+      }
+    }
+    // Defensive check for language
+    if (!req.body.language) {
+      throw new ApiError(400, 'Language is required');
+    }
     next();
-  } catch (error) {
-    return next(new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error.message));
   }
-};
+);
 
-// Apply validation and file handling separately in the route
+// Middleware to track files for cleanup
+const trackAlbumFiles = asyncHandler(
+  async (req: AuthenticatedRequest, res, next) => {
+    // For memory storage, files don't have paths yet, so we'll track them after saving
+    req['cleanupFiles'] = [];
+    next();
+  }
+);
+
+// Middleware to save files to disk after validation
+const saveAlbumFiles = asyncHandler(
+  async (req: AuthenticatedRequest, res, next) => {
+    // Debug log to verify files
+    console.log(req.file);
+    const savedPaths = [];
+    if (req.files) {
+      if (
+        Array.isArray(req.files.coverPicture) &&
+        req.files.coverPicture.length > 0
+      ) {
+        const coverPaths = saveFilesToDisk(
+          req.files.coverPicture,
+          'coverPicture'
+        );
+        req.body.coverPicture = coverPaths[0];
+        savedPaths.push(...coverPaths);
+      }
+      if (
+        Array.isArray(req.files.songFiles) &&
+        req.files.songFiles.length > 0
+      ) {
+        const songPaths = saveFilesToDisk(req.files.songFiles, 'songFiles');
+        req.body.songFiles = songPaths;
+        savedPaths.push(...songPaths);
+      }
+      if (
+        Array.isArray(req.files.songCovers) &&
+        req.files.songCovers.length > 0
+      ) {
+        const coverPaths = saveFilesToDisk(req.files.songCovers, 'songCovers');
+        req.body.songCovers = coverPaths;
+        savedPaths.push(...coverPaths);
+      }
+    }
+    req['cleanupFiles'] = savedPaths;
+    next();
+  }
+);
+
 router.post(
   '/create',
   verifyJWT,
-  validateAlbumData, // First validate non-file data
   uploadAlbum.fields([
-    { name: 'coverPicture', maxCount: 1 }, // Album Cover Image
-    { name: 'songFiles', maxCount: 10 }, // Song Files (MP3, WAV, etc.)
-    { name: 'songCovers', maxCount: 10 }, // Song Cover Images
+    { name: 'coverPicture', maxCount: 1 },
+    { name: 'songFiles', maxCount: 10 },
+    { name: 'songCovers', maxCount: 10 },
   ]),
-  async (req: AuthenticatedRequest, res, next) => {
-    try {
-      req.body.songs = JSON.parse(req.body.songs); // Convert string to JSON array
-
-      req.body.coverPicture = req.files.coverPicture[0].path;
-
-      if (!req.body.songs) {
-        return next(
-          new ApiError(StatusCodes.BAD_REQUEST, 'Songs data is required')
-        );
-      }
-
-      next(); // Proceed to validation & controller
-    } catch (error) {
-      return next(
-        new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, error.message)
-      );
-    }
-  },
+  trackAlbumFiles, // Track files for cleanup
+  parseAlbumFields,
   validateRequest(albumSchema),
+  saveAlbumFiles, // Save files after validation
   AlbumController.createAlbum
 );
 router.get('/', verifyJWT, AlbumController.getArtistAlbums);
 router.get('/get/allAlbums', verifyJWT, AlbumController.getAllAlbums);
 router.get('/album-by-id/:albumId', verifyJWT, AlbumController.getAlbumById);
 router.delete('/:albumId', verifyJWT, AlbumController.deleteAlbum);
+router.delete(
+  '/:albumId/song/:songId',
+  verifyJWT,
+  asyncHandler(async (req: AuthenticatedRequest, res) => {
+    const { albumId, songId } = req.params;
+    const userId = req.user._id;
+    const album = await Album.findById(albumId);
+    if (!album) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Album not found');
+    }
+    if (album.artist.toString() !== userId.toString()) {
+      throw new ApiError(StatusCodes.FORBIDDEN, 'Unauthorized');
+    }
+    // Remove songId from album.songs
+    album.songs = album.songs.filter((id) => id.toString() !== songId);
+    await album.save();
+    // Set song's album field to null
+    await Song.findByIdAndUpdate(songId, { album: null });
+    return res
+      .status(StatusCodes.OK)
+      .json({ message: 'Song removed from album' });
+  })
+);
 
 export default router;

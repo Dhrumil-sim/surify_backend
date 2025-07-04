@@ -19,7 +19,9 @@ class AlbumController {
         );
       }
       const userId = new mongoose.Types.ObjectId(_id);
-      const { title, genre, songs } = req.body;
+      const { title, genre, songs, language } = req.body;
+
+      console.log(req.files);
 
       const albumData = {
         title: title,
@@ -29,6 +31,7 @@ class AlbumController {
         songFiles: req.body.songFiles,
         songCovers: req.body.songCovers,
         userId,
+        language,
       };
 
       // Call the service to create album
