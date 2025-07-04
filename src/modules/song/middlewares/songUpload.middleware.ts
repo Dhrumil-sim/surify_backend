@@ -1,7 +1,5 @@
 import multer from 'multer';
 import path from 'path';
-import { ApiError } from '@utils';
-import { StatusCodes } from 'http-status-codes';
 
 // Set storage engine
 const storage = multer.diskStorage({
@@ -22,7 +20,7 @@ const storage = multer.diskStorage({
 // Initialize multer to handle both fields (audio and image)
 const uploadSong = multer({
   storage: storage,
-  limits: { fileSize: 10000000 }, // Limit file size to 5MB for each file
+  limits: { fileSize: 10000000 }, // Limit file size to 10MB for each file
   fileFilter: (_req, file, cb) => {
     // Call the function to check the file type based on the field name
     if (file.fieldname === 'coverPicture') {
@@ -47,12 +45,7 @@ function checkImageType(
   if (mimetype && extname) {
     return cb(null, true);
   } else {
-    cb(
-      new ApiError(
-        StatusCodes.UNSUPPORTED_MEDIA_TYPE,
-        'Only Images are allowed'
-      )
-    );
+    cb(new Error('Only Images are allowed: Unsupported Media Type'));
   }
 }
 
@@ -61,19 +54,14 @@ function checkAudioType(
   file: Express.Multer.File,
   cb: multer.FileFilterCallback
 ) {
-  const filetypes = /mp3|wav|ogg/;
+  const filetypes = /mp3|wav|ogg|flac|m4a/;
   const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
 
   // Allow file based on extension only
   if (extname) {
     return cb(null, true);
   } else {
-    cb(
-      new ApiError(
-        StatusCodes.UNSUPPORTED_MEDIA_TYPE,
-        'Only Music files are allowed'
-      )
-    );
+    cb(new Error('Only Music files are allowed: Unsupported Media Type'));
   }
 }
 

@@ -12,7 +12,13 @@ import { NextFunction, Request, Response } from 'express';
  * @param {Function} requestHandler - The async function to handle requests.
  * @returns {Function} Express middleware function that handles errors.
  */
-const asyncHandler = (requestHandler: Function) => {
+const asyncHandler = (
+  requestHandler: (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => Promise<unknown>
+) => {
   return (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(requestHandler(req, res, next)).catch((err) => next(err));
   };

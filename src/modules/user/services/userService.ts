@@ -4,7 +4,7 @@ import { ApiError } from '@utils';
 import {
   USER_CODES,
   USER_MESSAGES,
-} from '../constants/user.error.massages.constant';
+} from '../constants/user.error.massages.constant.js';
 
 class UserService {
   static async createUser(
@@ -17,7 +17,11 @@ class UserService {
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
 
     if (existingUser) {
-      throw new ApiError(StatusCodes.CONFLICT, 'User already exists');
+      throw new ApiError(
+        StatusCodes.CONFLICT,
+        USER_CODES.USER_ALREADY_EXISTS,
+        USER_MESSAGES.USER_ALREADY_EXISTS
+      );
     }
 
     const newUser = await User.create({
@@ -37,16 +41,22 @@ class UserService {
     const user = await User.findOne({
       $or: [{ username: emailOrUsername }, { email: emailOrUsername }],
     }).select('+password');
+
     if (!user) {
       throw new ApiError(
         StatusCodes.NOT_FOUND,
-        USER_CODES.NOT_FOUND,
-        USER_MESSAGES.NOT_FOUND
+        USER_CODES.USER_NOT_FOUND,
+        USER_MESSAGES.USER_NOT_FOUND
       );
     }
+
     const isPasswordValid = await user.isPasswordCorrect(password);
     if (!isPasswordValid) {
-      throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid credentials');
+      throw new ApiError(
+        StatusCodes.UNAUTHORIZED,
+        USER_CODES.INVALID_CREDENTIALS,
+        USER_MESSAGES.INVALID_CREDENTIALS
+      );
     }
     return user;
   }

@@ -5,6 +5,10 @@ import { ApiError } from '@utils';
 import { StatusCodes } from 'http-status-codes';
 import { SongHistory } from 'models/song.model';
 import { normalizeGenre } from '../utils/normalizeGenre.util';
+import {
+  SONG_CODES,
+  SONG_MESSAGES,
+} from '../constants/song.error.massages.constant.js';
 
 class SongService {
   /**
@@ -16,6 +20,8 @@ class SongService {
    * @param duration - The duration of the song in seconds.
    * @param coverPicture - The URL or path to the cover picture.
    * @param filePath - The path to the song file.
+   * @param fileHash - The hash of the song file.
+   * @param album - Optional album ID.
    * @returns The created song document.
    */
   static async createSong(
@@ -42,6 +48,7 @@ class SongService {
     });
     return newSong;
   }
+
   static async getAllSongs(
     filters: ISongQuery
   ): Promise<{ data: ISong[]; total: number; page: number; limit: number }> {
@@ -69,7 +76,6 @@ class SongService {
       }
     }
 
-    // Apply artist name filter
     // Apply artist name filter
     if (artist) {
       const isObjectId = mongoose.Types.ObjectId.isValid(artist);
@@ -112,11 +118,19 @@ class SongService {
       const objectId = new mongoose.Types.ObjectId(songId);
       const song = await Song.findById(objectId).where({ deletedAt: null });
       if (!song) {
-        throw new ApiError(StatusCodes.NOT_FOUND, 'Music not found');
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          SONG_CODES.SONG_NOT_FOUND,
+          SONG_MESSAGES.SONG_NOT_FOUND
+        );
       }
       return song;
-    } catch (error) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Music not found' + error);
+    } catch {
+      throw new ApiError(
+        StatusCodes.NOT_FOUND,
+        SONG_CODES.SONG_NOT_FOUND,
+        SONG_MESSAGES.SONG_NOT_FOUND
+      );
     }
   }
 
@@ -125,11 +139,19 @@ class SongService {
       const objectId = new mongoose.Types.ObjectId(albumId);
       const song = await Song.find({ deletedAt: null, album: objectId });
       if (!song) {
-        throw new ApiError(StatusCodes.NOT_FOUND, 'Music not found');
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          SONG_CODES.NO_SONGS_FOUND,
+          'No songs found in this album'
+        );
       }
       return song;
-    } catch (error) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Music not found' + error);
+    } catch {
+      throw new ApiError(
+        StatusCodes.NOT_FOUND,
+        SONG_CODES.NO_SONGS_FOUND,
+        'No songs found in this album'
+      );
     }
   }
 
@@ -147,18 +169,31 @@ class SongService {
       });
 
       if (!updatedSong) {
-        throw new ApiError(StatusCodes.NOT_FOUND, 'Music not found');
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          SONG_CODES.SONG_NOT_FOUND,
+          SONG_MESSAGES.SONG_NOT_FOUND
+        );
       }
 
       return updatedSong;
     } catch {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'Failed to update music');
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        SONG_CODES.SONG_UPDATE_FAILED,
+        SONG_MESSAGES.SONG_UPDATE_FAILED
+      );
     }
   }
+
   static async deleteSong(songId: string): Promise<void> {
     const songExists = await this.getSongById(songId);
     if (!songExists) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'Song is not found');
+      throw new ApiError(
+        StatusCodes.NOT_FOUND,
+        SONG_CODES.SONG_NOT_FOUND,
+        SONG_MESSAGES.SONG_NOT_FOUND
+      );
     }
     await Song.findByIdAndUpdate(songId, {
       deletedAt: new Date(),
@@ -192,22 +227,34 @@ class SongService {
             song.filePath,
             song.fileHash,
             album
-
-            // Pass the albumId to the createSong function
           )
         )
       );
       return createdSongs;
-    } catch (error) {
+    } catch {
       throw new ApiError(
-        StatusCodes.BAD_REQUEST,
-        'Failed to create songs: ' + error
+        StatusCodes.INTERNAL_SERVER_ERROR,
+        SONG_CODES.SONG_CREATION_FAILED,
+        SONG_MESSAGES.SONG_CREATION_FAILED
       );
     }
   }
+
   static async getSongHistory(songId: string): Promise<ISongHistory[]> {
-    return await SongHistory.find({ songId }).sort({ updatedAt: -1 });
+    try {
+      const objectId = new mongoose.Types.ObjectId(songId);
+      const history = await SongHistory.find({ songId: objectId })
+        .sort({ updatedAt: -1 })
+        .limit(10);
+      return history;
+    } catch {
+      throw new ApiError(
+        StatusCodes.NOT_FOUND,
+        SONG_CODES.SONG_NOT_FOUND,
+        SONG_MESSAGES.SONG_NOT_FOUND
+      );
+    }
   }
 }
 
-export default SongService;
+export { SongService };
