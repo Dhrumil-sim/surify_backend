@@ -3,7 +3,6 @@ import { StatusCodes } from 'http-status-codes';
 import { asyncHandler, ApiError, ResponseHandler } from '@utils';
 import { SongService } from '@songModule';
 import SongMetaData from '../utils/songMetadata.util.js';
-import { SongFileHash } from '../utils/songFilehash.util.js';
 import { ISong } from '../interfaces/song.types.interfaces.js';
 import {
   SONG_CODES,
@@ -36,7 +35,7 @@ class SongController {
 
       try {
         // Extract song data from request
-        const { title, genre } = req.body;
+        const { title, genre, language } = req.body;
         const coverFile = req.files?.coverPicture?.[0]?.path;
         const songFile = req.files?.filePath?.[0]?.path;
 
@@ -48,9 +47,6 @@ class SongController {
           );
         }
 
-        // Generate file hash
-        const fileHash = await SongFileHash.fileHash(songFile);
-
         // Extract metadata for duration
         const songMetadata = await SongMetaData.getMetadata(songFile);
         const duration = songMetadata.format?.duration || 0;
@@ -59,11 +55,11 @@ class SongController {
           artistId,
           title,
           JSON.parse(genre),
+          language,
           new Date(),
           duration,
           coverFile || '',
-          songFile,
-          fileHash
+          songFile
         );
 
         return ResponseHandler.created(

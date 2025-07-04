@@ -16,11 +16,11 @@ class SongService {
    * @param artist - The ID of the artist uploading the song.
    * @param title - The title of the song.
    * @param genre - An array of genres associated with the song.
+   * @param language - The language of the song.
    * @param releaseDate - The release date of the song.
    * @param duration - The duration of the song in seconds.
    * @param coverPicture - The URL or path to the cover picture.
    * @param filePath - The path to the song file.
-   * @param fileHash - The hash of the song file.
    * @param album - Optional album ID.
    * @returns The created song document.
    */
@@ -28,23 +28,23 @@ class SongService {
     artist: mongoose.Types.ObjectId,
     title: string,
     genre: string[],
+    language: string,
     releaseDate: Date,
     duration: number,
     coverPicture: string,
     filePath: string,
-    fileHash: string,
     album?: mongoose.Types.ObjectId
   ): Promise<ISong> {
     const newSong = await Song.create({
       artist,
       title,
       genre,
+      language,
       releaseDate,
       duration,
       coverPicture,
       filePath,
-      ...album,
-      fileHash,
+      ...(album && { album }),
     });
     return newSong;
   }
@@ -221,11 +221,11 @@ class SongService {
             artist,
             song.title,
             song.genre,
+            song.fileHash,
             song.releaseDate,
             song.duration,
             song.coverPicture,
             song.filePath,
-            song.fileHash,
             album
           )
         )

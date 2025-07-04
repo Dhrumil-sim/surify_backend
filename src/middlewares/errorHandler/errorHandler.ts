@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { ApiError } from '@utils';
 import { StatusCodes } from 'http-status-codes';
 import chalk from 'chalk';
+import fs from 'fs';
 
 const errorHandler = (
   err: Error | ApiError,
@@ -66,6 +67,17 @@ const errorHandler = (
   // Ensure statusCode is valid
   if (!statusCode || statusCode < 100 || statusCode > 599) {
     statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
+  }
+
+  // Delete uploaded files if present in req.cleanupFiles
+  if (Array.isArray(req['cleanupFiles'])) {
+    req['cleanupFiles'].forEach((filePath: string) => {
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error(`Failed to delete file: ${filePath}`, err);
+        }
+      });
+    });
   }
 
   res.status(statusCode).json({
