@@ -5,12 +5,18 @@ import {
   deletePlaylistSchema,
   deleteSongFromPlaylistSchema,
   getSongsFromPlaylistSchema,
+  sharePlaylistSchema,
+  removeUserFromSharedPlaylistSchema,
+  getUsersWithPlaylistAccessSchema,
 } from '@playlistModule/validators/playlist.joi.validator';
 import {
   addSongToPlaylistSchemaPreField,
   deletePlaylistSchemaPreField,
   deleteSongToPlaylistSchemaPreField,
   getSongFromPlaylistSchemaPreField,
+  sharePlaylistSchemaPreField,
+  removeUserFromSharedPlaylistSchemaPreField,
+  getUsersWithPlaylistAccessSchemaPreField,
 } from '@playlistModule/validators/playlistFields.pre.validator';
 import { Router } from 'express';
 
@@ -74,4 +80,32 @@ router.get(
 
 // get shared playlist of the current user
 router.get('/shared', verifyJWT, PlaylistController.getSharedPlaylistsWithUser);
+
+// Share playlist with user
+router.post(
+  '/:playlistId/share/:userId',
+  verifyJWT,
+  sharePlaylistSchemaPreField,
+  validateRequest(sharePlaylistSchema),
+  PlaylistController.addUserToSharedPlaylist
+);
+
+// Remove user from shared playlist
+router.delete(
+  '/:playlistId/share/:userId',
+  verifyJWT,
+  removeUserFromSharedPlaylistSchemaPreField,
+  validateRequest(removeUserFromSharedPlaylistSchema),
+  PlaylistController.removeUserFromSharedPlaylist
+);
+
+// Get users with access to playlist
+router.get(
+  '/:playlistId/share',
+  verifyJWT,
+  getUsersWithPlaylistAccessSchemaPreField,
+  validateRequest(getUsersWithPlaylistAccessSchema),
+  PlaylistController.getUsersWithPlaylistAccess
+);
+
 export default router;

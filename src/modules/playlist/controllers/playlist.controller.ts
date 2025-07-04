@@ -472,4 +472,109 @@ export class PlaylistController {
       );
     }
   );
+
+  static removeUserFromSharedPlaylist = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const playlistId = new mongoose.Types.ObjectId(req?.params?.playlistId);
+      const creatorId = new mongoose.Types.ObjectId(req?.user?._id);
+      const userId = new mongoose.Types.ObjectId(req?.params?.userId);
+
+      // Check if current user is the playlist creator
+      const playlist = await PLaylistPreValidator.isPlaylistExist(
+        undefined,
+        undefined,
+        playlistId
+      );
+
+      if (!playlist) {
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          PLAYLIST_CODES.PLAYLIST_NOT_FOUND,
+          PLAYLIST_MESSAGES.PLAYLIST_NOT_FOUND
+        );
+      }
+
+      if (!playlist.createdBy.equals(creatorId)) {
+        throw new ApiError(
+          StatusCodes.UNAUTHORIZED,
+          SHARED_PLAYLIST_CODES.ADD_USER_TO_PLAYLIST,
+          SHARED_PLAYLIST_MESSAGES.UNAUTHORIZED
+        );
+      }
+
+      // Check if user is actually shared with this playlist
+      const isShared = await PLaylistPreValidator.isPlaylistAlreadyShared(
+        userId,
+        playlistId,
+        creatorId
+      );
+
+      if (!isShared) {
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          SHARED_PLAYLIST_CODES.REMOVE_USER_FROM_PLAYLIST,
+          SHARED_PLAYLIST_MESSAGES.USER_NOT_SHARED
+        );
+      }
+
+      const removedUser = await PlaylistService.removeUserFromSharedPlaylist(
+        playlistId,
+        userId
+      );
+
+      if (!removedUser) {
+        throw new ApiError(
+          StatusCodes.INTERNAL_SERVER_ERROR,
+          SHARED_PLAYLIST_CODES.REMOVE_USER_FROM_PLAYLIST_FAILED,
+          SHARED_PLAYLIST_MESSAGES.REMOVE_USER_FROM_PLAYLIST_FAILED
+        );
+      }
+
+      return ResponseHandler.success(
+        res,
+        removedUser,
+        SHARED_PLAYLIST_MESSAGES.REMOVE_USER_FROM_PLAYLIST_SUCCESS
+      );
+    }
+  );
+
+  static getUsersWithPlaylistAccess = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const playlistId = new mongoose.Types.ObjectId(req?.params?.playlistId);
+      const userId = new mongoose.Types.ObjectId(req?.user?._id);
+
+      // Check if current user has access to this playlist
+      const playlist = await PLaylistPreValidator.isPlaylistExist(
+        undefined,
+        undefined,
+        playlistId
+      );
+
+      if (!playlist) {
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          PLAYLIST_CODES.PLAYLIST_NOT_FOUND,
+          PLAYLIST_MESSAGES.PLAYLIST_NOT_FOUND
+        );
+      }
+
+      // Only playlist creator can see who has access
+      if (!playlist.createdBy.equals(userId)) {
+        throw new ApiError(
+          StatusCodes.UNAUTHORIZED,
+          SHARED_PLAYLIST_CODES.ADD_USER_TO_PLAYLIST,
+          SHARED_PLAYLIST_MESSAGES.UNAUTHORIZED
+        );
+      }
+
+      const usersWithAccess =
+        await PlaylistService.getUsersWithPlaylistAccess(playlistId);
+
+      return ResponseHandler.success(
+        res,
+        usersWithAccess,
+        SHARED_PLAYLIST_MESSAGES.GET_USERS_WITH_ACCESS_SUCCESS
+      );
+    }
+  );
 }

@@ -88,6 +88,10 @@ export const SHARED_PLAYLIST_CODES = {
   USER_NOT_FOUND: 'USER_NOT_FOUND',
   CONFLICT_USERS: 'CONFLICT_USERS',
   ALREADY_SHARED: 'ALREADY_SHARED',
+  REMOVE_USER_FROM_PLAYLIST: 'REMOVE_USER_FROM_PLAYLIST',
+  REMOVE_USER_FROM_PLAYLIST_FAILED: 'REMOVE_USER_FROM_PLAYLIST_FAILED',
+  GET_USERS_WITH_ACCESS: 'GET_USERS_WITH_ACCESS',
+  GET_USERS_WITH_ACCESS_FAILED: 'GET_USERS_WITH_ACCESS_FAILED',
 };
 
 export const SHARED_PLAYLIST_MESSAGES = {
@@ -99,4 +103,12 @@ export const SHARED_PLAYLIST_MESSAGES = {
   ALREADY_SHARED: 'Playlist is already shared with given user',
   GET_SHARED_PLAYLIST_SUCCESS: 'Shared playlist fetched successfully',
   GET_SHARED_PLAYLIST_FAILED: 'Shared playlist not found',
+  REMOVE_USER_FROM_PLAYLIST_SUCCESS:
+    'User removed from shared playlist successfully',
+  REMOVE_USER_FROM_PLAYLIST_FAILED:
+    'Failed to remove user from shared playlist',
+  GET_USERS_WITH_ACCESS_SUCCESS:
+    'Users with playlist access fetched successfully',
+  GET_USERS_WITH_ACCESS_FAILED: 'Failed to fetch users with playlist access',
+  USER_NOT_SHARED: 'User is not shared with this playlist',
 };

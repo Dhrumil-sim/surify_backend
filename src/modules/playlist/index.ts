@@ -20,7 +20,18 @@ import type {
   ISharedPlaylist,
   ISharedPlaylistAddUserRequest,
 } from './interfaces/playlist.types.interface';
-import { addSongToPlaylistSchemaPreField } from './validators/playlistFields.pre.validator';
+import {
+  addSongToPlaylistSchemaPreField,
+  sharePlaylistSchemaPreField,
+  removeUserFromSharedPlaylistSchemaPreField,
+  getUsersWithPlaylistAccessSchemaPreField,
+} from './validators/playlistFields.pre.validator';
+import {
+  sharePlaylistSchema,
+  removeUserFromSharedPlaylistSchema,
+  getUsersWithPlaylistAccessSchema,
+} from './validators/playlist.joi.validator';
+
 export {
   IPlayList,
   IPlayListRequest,
@@ -39,4 +50,10 @@ export {
   ISharedPlaylist,
   ISharedPlaylistAddUserRequest,
   addSongToPlaylistSchemaPreField,
+  sharePlaylistSchemaPreField,
+  removeUserFromSharedPlaylistSchemaPreField,
+  getUsersWithPlaylistAccessSchemaPreField,
+  sharePlaylistSchema,
+  removeUserFromSharedPlaylistSchema,
+  getUsersWithPlaylistAccessSchema,
 };
