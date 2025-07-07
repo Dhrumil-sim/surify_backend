@@ -54,14 +54,6 @@ export class PlaylistService {
       .limit(limit);
     const total = await Playlist.countDocuments(filter);
 
-    if (!playlists.length) {
-      throw new ApiError(
-        StatusCodes.NOT_FOUND,
-        PLAYLIST_CODES.NOT_FOUND,
-        PLAYLIST_MESSAGES.NOT_FOUND
-      );
-    }
-
     return { playlists, total, sort, filter, query };
   }
 
@@ -123,8 +115,8 @@ export class PlaylistService {
       if (!deletedPlaylist) {
         throw new ApiError(
           StatusCodes.NOT_FOUND,
-          PLAYLIST_CODES.DELETION_FAILED,
-          PLAYLIST_MESSAGES.DELETION_FAILED
+          PLAYLIST_CODES.PLAYLIST_DELETION_FAILED,
+          PLAYLIST_MESSAGES.PLAYLIST_DELETION_FAILED
         );
       }
 
@@ -143,8 +135,8 @@ export class PlaylistService {
       await session.abortTransaction();
       throw new ApiError(
         StatusCodes.INTERNAL_SERVER_ERROR,
-        PLAYLIST_CODES.DELETION_FAILED,
-        PLAYLIST_MESSAGES.DELETION_FAILED + '' + error
+        PLAYLIST_CODES.PLAYLIST_DELETION_FAILED,
+        PLAYLIST_MESSAGES.PLAYLIST_DELETION_FAILED + '' + error
       );
     } finally {
       // End the session
@@ -213,5 +205,28 @@ export class PlaylistService {
   static async getSharedPlaylistWithUser(userId: ISharedPlaylist['userId']) {
     const sharedPlaylist = await SharedPlaylist.find({ userId: userId });
     return sharedPlaylist;
+  }
+
+  static async removeUserFromSharedPlaylist(
+    playlistId: ISharedPlaylist['playlistId'],
+    userId: ISharedPlaylist['userId']
+  ) {
+    const removedUser = await SharedPlaylist.findOneAndUpdate(
+      { playlistId: playlistId, userId: userId },
+      { deletedAt: Date.now() },
+      { new: true }
+    );
+    return removedUser;
+  }
+
+  static async getUsersWithPlaylistAccess(
+    playlistId: ISharedPlaylist['playlistId']
+  ) {
+    const usersWithAccess = await SharedPlaylist.find({
+      playlistId: playlistId,
+      deletedAt: null,
+    }).populate('userId', 'username email');
+
+    return usersWithAccess;
   }
 }

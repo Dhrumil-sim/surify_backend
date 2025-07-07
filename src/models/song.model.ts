@@ -29,7 +29,7 @@ const songSchema = new Schema<ISong>(
       type: [String],
       required: true,
     },
-    fileHash: {
+    language: {
       type: String,
       required: true,
     },

@@ -38,6 +38,12 @@ export const albumSchema = Joi.object({
       'string.invalid': `"genre" must be a valid JSON array`,
     }),
 
+  language: Joi.string().trim().required().messages({
+    'string.base': `"language" should be a string`,
+    'string.trim': `"language" should not have leading or trailing spaces`,
+    'any.required': `"language" is required`,
+  }),
+
   songs: Joi.array()
     .optional()
     .items(

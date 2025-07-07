@@ -11,6 +11,7 @@ export interface IAlbum extends Document {
   artist: mongoose.Types.ObjectId;
   title: string;
   genre: string[];
+  language: string;
   releaseDate: Date;
   coverPicture: string;
   songs: mongoose.Types.ObjectId[];

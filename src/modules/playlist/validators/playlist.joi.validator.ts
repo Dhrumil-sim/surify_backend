@@ -62,3 +62,17 @@ export const addOrDeleteUserToSharedPlaylistSchema = Joi.object({
   playlistId: objectIdSchema.required(),
   userId: objectIdSchema.required(),
 });
+
+export const sharePlaylistSchema = Joi.object({
+  playlistId: objectIdSchema.required(),
+  userId: objectIdSchema.required(),
+});
+
+export const removeUserFromSharedPlaylistSchema = Joi.object({
+  playlistId: objectIdSchema.required(),
+  userId: objectIdSchema.required(),
+});
+
+export const getUsersWithPlaylistAccessSchema = Joi.object({
+  playlistId: objectIdSchema.required(),
+});

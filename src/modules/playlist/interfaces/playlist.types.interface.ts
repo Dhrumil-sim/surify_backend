@@ -5,7 +5,6 @@ export interface IPlayList extends Document {
   name: string;
   description: string;
   createdBy: mongoose.Types.ObjectId;
-  isActive: boolean;
   isShared: boolean;
   deletedAt?: Date | null;
   __v?: number;
@@ -66,6 +65,7 @@ export interface PaginationQuery {
   sortOrder?: 'asc' | 'desc'; // Sort order
   search?: string; // Search term for filtering
 }
+<<<<<<< HEAD
 export interface ISharedPlaylist extends Document {
   _id: mongoose.Types.ObjectId;
   playlistId: IPlayList['id'];
@@ -81,4 +81,20 @@ export interface ISharedPlaylistAddUserRequest {
   playlistId: IPlayList['id'];
   userId: ISharedPlaylist['userId'];
   sharedBy: ISharedPlaylist['sharedBy'];
+=======
+
+export interface ISharedPlaylist extends Document {
+  _id: mongoose.Types.ObjectId;
+  playlistId: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
+  sharedBy: mongoose.Types.ObjectId;
+  deletedAt?: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ISharedPlaylistAddUserRequest {
+  playlistId: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
+>>>>>>> 0faed5954958aa74b7c874387fdc95e7548d3e64
 }

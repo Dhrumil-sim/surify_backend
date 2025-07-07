@@ -39,3 +39,26 @@ export const addOrDeleteUserToSharedPlaylistSchemaPreField = asyncHandler(
     next();
   }
 );
+
+export const sharePlaylistSchemaPreField = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    req.body.playlistId = req?.params?.playlistId;
+    req.body.userId = req?.params?.userId;
+    next();
+  }
+);
+
+export const removeUserFromSharedPlaylistSchemaPreField = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    req.body.playlistId = req?.params?.playlistId;
+    req.body.userId = req?.params?.userId;
+    next();
+  }
+);
+
+export const getUsersWithPlaylistAccessSchemaPreField = asyncHandler(
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    req.body.playlistId = req?.params?.playlistId;
+    next();
+  }
+);

@@ -11,4 +11,7 @@ const listeningHistorySchema = new Schema({
   playedAt: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model('ListeningHistory', listeningHistorySchema);
+export const ListeningHistory = mongoose.model(
+  'ListeningHistory',
+  listeningHistorySchema
+);

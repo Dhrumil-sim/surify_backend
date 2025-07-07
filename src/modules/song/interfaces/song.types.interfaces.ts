@@ -12,7 +12,7 @@ interface ISong extends Document {
   duration: number;
   coverPicture: string;
   filePath: string;
-  fileHash: string;
+  language: string;
   deletedAt?: Date | null;
 }
 

@@ -1,14 +1,12 @@
 import { validateRequest, verifyJWT } from '@middlewares';
 import { PlaylistController, updatePlaylistSchema } from '@playlistModule';
 import {
-  addOrDeleteUserToSharedPlaylistSchema,
   addSongToPlaylistSchema,
   deletePlaylistSchema,
   deleteSongFromPlaylistSchema,
   getSongsFromPlaylistSchema,
 } from '@playlistModule/validators/playlist.joi.validator';
 import {
-  addOrDeleteUserToSharedPlaylistSchemaPreField,
   addSongToPlaylistSchemaPreField,
   deletePlaylistSchemaPreField,
   deleteSongToPlaylistSchemaPreField,
@@ -75,22 +73,5 @@ router.get(
 );
 
 // get shared playlist of the current user
-// Get shared playlists
-router.get('/shared', verifyJWT, PlaylistController.getSharedPlaylistsWithUser);
-
-// Add a user to a shared playlist
-router.post(
-  '/:playlistId/shared-users/:userId',
-  verifyJWT,
-  addOrDeleteUserToSharedPlaylistSchemaPreField,
-  validateRequest(addOrDeleteUserToSharedPlaylistSchema),
-  PlaylistController.addUserToSharedPlaylist
-);
-
-router.delete(
-  '/:playlistId/shared-users/:userId',
-  verifyJWT,
-  addOrDeleteUserToSharedPlaylistSchemaPreField,
-  validateRequest(addOrDeleteUserToSharedPlaylistSchema)
-);
+router.get('/shared');
 export default router;

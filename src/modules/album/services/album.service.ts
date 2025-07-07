@@ -1,5 +1,5 @@
 import { Album, Song } from '@models';
-import { ISong, SongFileHash, SongMetaData, SongService } from '@songModule';
+import { ISong, SongMetaData, SongService } from '@songModule';
 import mongoose from 'mongoose';
 import { IAlbum } from '@albumModule';
 import { ApiError } from '@utils';
@@ -14,9 +14,18 @@ export class AlbumService {
     songFiles: string[];
     songCovers: string[];
     userId: mongoose.Types.ObjectId;
+    language: string;
   }): Promise<IAlbum> {
-    const { title, genre, songs, coverPicture, songFiles, songCovers, userId } =
-      albumData;
+    const {
+      title,
+      genre,
+      songs,
+      coverPicture,
+      songFiles,
+      songCovers,
+      userId,
+      language,
+    } = albumData;
 
     const songsWithFiles: Partial<ISong>[] = await Promise.all(
       songs.map(async (song, index) => {
@@ -24,12 +33,10 @@ export class AlbumService {
         const coverPath = songCovers[index];
 
         let duration = 0;
-        let fileHashVal = '';
+        const fileHashVal = '';
         try {
           const metadata = await SongMetaData.getMetadata(filePath);
-          const fileHash = await SongFileHash.fileHash(filePath);
           duration = metadata.format.duration || 0;
-          fileHashVal = fileHash;
         } catch {
           console.warn(`Metadata failed for ${filePath}`);
         }
@@ -42,6 +49,7 @@ export class AlbumService {
           releaseDate: new Date(),
           fileHash: fileHashVal,
           duration,
+          language,
         };
       })
     );
@@ -50,12 +58,14 @@ export class AlbumService {
       artist: new mongoose.Types.ObjectId(userId),
       title,
       genre,
+      language,
       releaseDate: new Date(),
       coverPicture,
     });
 
     const createdSongs = await Promise.all(
       songsWithFiles.map(async (song) => {
+        console.log(song);
         const newSong = await Song.create({
           ...song,
           artist: new mongoose.Types.ObjectId(userId),

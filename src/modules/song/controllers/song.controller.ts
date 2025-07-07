@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
-
-import { ApiError } from '@utils';
-import { SongService } from '@songModule';
 import { StatusCodes } from 'http-status-codes';
-import { Song } from '@models';
-import { ISong } from '@songModule';
-import { SongFileHash, SongMetaData } from '@songModule';
-import { asyncHandler } from '@utils';
+import { ISong, SongService } from '@songModule';
+import { SongMetaData } from '@songModule';
+import { ApiError, asyncHandler, ResponseHandler } from '@utils';
 import { ApiResponse } from '@utils';
+import {
+  SONG_CODES,
+  SONG_MESSAGES,
+} from '../constants/song.error.massages.constant';
 import { AudioStreamingUtil, StreamingRequest } from '../utils/streaming.utils';
 export interface AuthenticatedRequest extends Request {
   cookies: { accessToken?: string; refreshToken?: string }; // Define cookies with accessToken
@@ -24,76 +24,49 @@ export interface AuthenticatedRequest extends Request {
 class SongController {
   static createSong = asyncHandler(
     async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-      const { role, _id: artistId } = req.user; // Extract user details
-      const { title } = req.body;
-      // Check if the user is an artist
+      const { role, _id: artistId } = req.user;
       if (role !== 'artist') {
-        return res
-          .status(403)
-          .json({ message: 'Access denied: Only artists can upload songs' });
-      }
-      const existingSong = await Song.find({
-        title: title,
-        artist: artistId,
-        deletedAt: null,
-      });
-
-      if (existingSong.length > 0) {
         throw new ApiError(
-          StatusCodes.CONFLICT,
-          'SONG_ALREADY_EXIST',
-          'Song with given title is already exist'
+          StatusCodes.UNAUTHORIZED,
+          SONG_CODES.ONLY_ARTIST_CAN_PERFORM,
+          SONG_MESSAGES.ONLY_ARTIST_CAN_PERFORM
         );
       }
-      // Add the artist ID to the request body
-      req.body.artist = artistId;
 
-      const coverFile = req.files?.coverPicture?.[0]?.path;
-      const songFile = req.files?.filePath?.[0]?.path; // Get the song file path
-      // Ensure the file exists before trying to get metadata
-      if (!songFile) {
-        return res.status(400).json({ message: 'No song file uploaded' });
-      }
-      const fileHash = await SongFileHash.fileHash(songFile);
-
-      // Call the getMetadata function with path of songFile
-      const songMetadata = await SongMetaData.getMetadata(songFile);
-      const {
-        format: { duration },
-      } = songMetadata;
-      const duplicate = await Song.findOne({
-        fileHash: fileHash,
-        artist: artistId,
-        duration: duration,
-        deletedAt: null,
-      });
-      if (duplicate) {
-        throw new ApiError(
-          StatusCodes.CONFLICT,
-          'SONG_DUPLICATION',
-          'Song file is already exists with the given file content'
-        );
-      }
       try {
-        const { title, genre } = req.body;
-        const genreArray = JSON.parse(genre);
-        const releaseDate = new Date();
+        // Extract song data from request
+        const { title, genre, language } = req.body;
+        const coverFile = req.files?.coverPicture?.[0]?.path;
+        const songFile = req.files?.filePath?.[0]?.path;
+
+        if (!songFile) {
+          throw new ApiError(
+            StatusCodes.BAD_REQUEST,
+            SONG_CODES.FILE_UPLOAD_FAILED,
+            SONG_MESSAGES.FILE_UPLOAD_FAILED
+          );
+        }
+
+        // Extract metadata for duration
+        const songMetadata = await SongMetaData.getMetadata(songFile);
+        const duration = songMetadata.format?.duration || 0;
 
         const newSong = await SongService.createSong(
           artistId,
           title,
-          genreArray,
-          releaseDate,
-          duration!,
-          coverFile!,
-          songFile,
-          fileHash
+          JSON.parse(genre),
+          language,
+          new Date(),
+          duration,
+          coverFile || '',
+          songFile
         );
 
-        // Proceed with song creation (e.g., saving to the database)
-        res
-          .status(201)
-          .json({ message: 'Song created successfully', data: newSong });
+        return ResponseHandler.created(
+          res,
+          newSong,
+          SONG_MESSAGES.SONG_CREATED
+        );
       } catch (error) {
         return next(error);
       }
@@ -103,14 +76,12 @@ class SongController {
   static getSongsByArtistId = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       const artistId = req.params.artistId;
-      console.log(artistId);
-      // Reuse query params for pagination/sorting etc.
       const { title, genre, sortBy, page, limit } = req.query;
 
       const filters = {
         title: title?.toString(),
         genre: genre?.toString(),
-        artist: artistId, // Inject artistId here
+        artist: artistId,
         sortBy: sortBy?.toString(),
         page: page ? parseInt(page.toString()) : undefined,
         limit: limit ? parseInt(limit.toString()) : undefined,
@@ -123,25 +94,31 @@ class SongController {
         limit: pageSize,
       } = await SongService.getAllSongs(filters);
 
-      console.log(data);
       if (total === 0) {
-        throw new ApiError(StatusCodes.NOT_FOUND, 'No_music_Founded');
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          SONG_CODES.NO_SONGS_FOUND,
+          SONG_MESSAGES.NO_SONGS_FOUND
+        );
       } else if (data.length === 0) {
         throw new ApiError(
           StatusCodes.NOT_FOUND,
-          'No_Data_In_Page',
-          'No data is found in the page'
+          SONG_CODES.NO_SONGS_IN_PAGE,
+          SONG_MESSAGES.NO_SONGS_IN_PAGE
         );
-      } else {
-        const response = new ApiResponse(
-          StatusCodes.OK,
-          { songs: data, total, page: currentPage, limit: pageSize },
-          'Songs fetched by artist!'
-        );
-        res.status(response.statusCode).json(response);
       }
+
+      return ResponseHandler.paginated(
+        res,
+        data,
+        total,
+        currentPage,
+        pageSize,
+        'Songs fetched by artist successfully'
+      );
     }
   );
+
   static getAllSong = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       const { title, genre, artist, sortBy, page, limit } = req.query;
@@ -163,12 +140,16 @@ class SongController {
       } = await SongService.getAllSongs(filters);
 
       if (!total) {
-        throw new ApiError(StatusCodes.NOT_FOUND, 'No_music_Founded');
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          SONG_CODES.NO_SONGS_FOUND,
+          SONG_MESSAGES.NO_SONGS_FOUND
+        );
       } else if (!data.length) {
         throw new ApiError(
           StatusCodes.NOT_FOUND,
-          'No_Data_In_Page',
-          'No data is found in the page'
+          SONG_CODES.NO_SONGS_IN_PAGE,
+          SONG_MESSAGES.NO_SONGS_IN_PAGE
         );
       } else {
         const response = new ApiResponse(
@@ -176,7 +157,6 @@ class SongController {
           { songs: data, total, page: currentPage, limit: pageSize },
           'Songs are searched!'
         );
-
         res.status(response.statusCode).json(response);
       }
     }
@@ -184,20 +164,39 @@ class SongController {
 
   static getSongById = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const songId = '' + req.params.songId;
-
+      const songId = req.params.songId;
       const song = await SongService.getSongById(songId);
-      console.log(song);
-      res.status(200).json({ song });
+
+      if (!song) {
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          SONG_CODES.SONG_NOT_FOUND,
+          SONG_MESSAGES.SONG_NOT_FOUND
+        );
+      }
+
+      return ResponseHandler.success(res, song, SONG_MESSAGES.SONG_FETCHED);
     }
   );
 
   static getSongByAlbumId = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const albumId = '' + req.params.albumId;
-      const song = await SongService.getSongByAlbumId(albumId);
-      console.log(song);
-      res.status(200).json({ song });
+      const albumId = req.params.albumId;
+      const songs = await SongService.getSongByAlbumId(albumId);
+
+      if (!songs || songs.length === 0) {
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          SONG_CODES.NO_SONGS_FOUND,
+          'No songs found in this album'
+        );
+      }
+
+      return ResponseHandler.success(
+        res,
+        songs,
+        'Album songs fetched successfully'
+      );
     }
   );
 
@@ -205,29 +204,36 @@ class SongController {
     async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
       const { role, _id: artistId } = req.user;
       const songId = req.params.songId;
-      // check for existing song
-      const existingSong = await SongService.getSongById(songId);
 
+      const existingSong = await SongService.getSongById(songId);
       if (!existingSong) {
-        throw new ApiError(StatusCodes.NOT_FOUND, 'Song not found');
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          SONG_CODES.SONG_NOT_FOUND,
+          SONG_MESSAGES.SONG_NOT_FOUND
+        );
       }
+
       if (role !== 'artist' && !existingSong.artist.equals(artistId)) {
         throw new ApiError(
           StatusCodes.UNAUTHORIZED,
-          'Only Artist can update their own song'
+          SONG_CODES.ONLY_ARTIST_CAN_UPDATE,
+          SONG_MESSAGES.ONLY_ARTIST_CAN_UPDATE
         );
       }
+
       // Handle updated files
       const updatedCoverPicture = req.files?.coverPicture?.[0]?.path;
       const updatedFilePath = req.files?.filePath?.[0]?.path;
 
       // Extract metadata if a new song file is uploaded
-      let updatedDuration = existingSong.duration; // Default to existing duration
+      let updatedDuration = existingSong.duration;
       if (updatedFilePath) {
         const songMetadata = await SongMetaData.getMetadata(updatedFilePath);
         updatedDuration =
           songMetadata.format?.duration ?? existingSong.duration;
       }
+
       const { title, genre } = req.body;
       const updatedFields: Partial<ISong> = {
         title: title || existingSong.title,
@@ -237,54 +243,44 @@ class SongController {
         duration: updatedDuration,
       };
 
-      console.log(updatedFields);
-
       try {
-        // Update the song in the database
         const updatedSong = await SongService.updateSong(songId, updatedFields);
-        const oldData = await SongService.getSongHistory(songId);
-        const oldDataResponse = new ApiResponse(
-          StatusCodes.OK,
-          oldData,
-          'Song History'
-        );
-        const updatedSongResponse = new ApiResponse(
-          StatusCodes.OK,
+        return ResponseHandler.success(
+          res,
           updatedSong,
-          'Updated Song !'
+          SONG_MESSAGES.SONG_UPDATED
         );
-        res.status(oldDataResponse.statusCode).json(oldDataResponse);
-        res.status(200).json({
-          message: 'Song updated successfully',
-          data: updatedSong,
-        });
-        res.status(updatedSongResponse.statusCode).json(updatedSongResponse);
       } catch (error) {
         return next(error);
       }
     }
   );
 
-  // soft delete
   static deleteSong = asyncHandler(
     async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
       const songId = req.params.songId;
-      const { role, id: artistId } = req.user;
-      console.log('Artist id :', artistId);
+      const { role, _id: artistId } = req.user;
+
       const song = await SongService.getSongById(songId);
+      if (!song) {
+        throw new ApiError(
+          StatusCodes.NOT_FOUND,
+          SONG_CODES.SONG_NOT_FOUND,
+          SONG_MESSAGES.SONG_NOT_FOUND
+        );
+      }
+
       if (role !== 'artist' && !song.artist.equals(artistId)) {
         throw new ApiError(
           StatusCodes.UNAUTHORIZED,
-          'Only Artist can delete their own song'
+          SONG_CODES.ONLY_ARTIST_CAN_DELETE,
+          SONG_MESSAGES.ONLY_ARTIST_CAN_DELETE
         );
       }
+
       try {
         await SongService.deleteSong(songId);
-        return res
-          .status(200)
-          .json(
-            new ApiResponse(StatusCodes.OK, {}, 'Song Deleted Successfully')
-          );
+        return ResponseHandler.deleted(res, null, SONG_MESSAGES.SONG_DELETED);
       } catch (error) {
         return next(error);
       }

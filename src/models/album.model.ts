@@ -20,6 +20,10 @@ const albumSchema = new Schema<IAlbum>(
       type: [String],
       required: true,
     },
+    language: {
+      type: String,
+      required: true,
+    },
     releaseDate: {
       type: Date,
       required: true,
